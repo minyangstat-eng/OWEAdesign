@@ -137,6 +137,14 @@
   crit <- criterion_cpp(as.integer(pp), as.integer(keep), as.numeric(w_sel),
                         as.integer(info_mode), scaled, as.matrix(wb),
                         as.matrix(infor0))
+  # A design can look certified (max_d <= eps0 through the pseudo-inverse) and
+  # still have no usable criterion value: a singular c-optimal design, where
+  # c'M^-c is undefined, gives -Inf / NaN here on some platforms.  Report it as
+  # singular so that the caller falls back to the OWEA engine.
+  if (!is.finite(crit))
+    return(list(support = X[0, , drop = FALSE], weights = numeric(0),
+                criterion = Inf, max_d = Inf, converged = FALSE,
+                iterations = mw$iter, singular = TRUE))
   list(support = X[keep, , drop = FALSE], weights = w_sel,
        criterion = crit, max_d = ve$max_d, converged = ve$max_d <= eps0,
        iterations = mw$iter, singular = FALSE)

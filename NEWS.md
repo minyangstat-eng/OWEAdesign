@@ -7,6 +7,13 @@
   `library(OWEAdesign)`; the function names (`optimal_design()`, `owea()`,
   `run_owea_app()`, ...) are the same. The earlier entries below were released
   under the old name.
+* `solver = "MA"`: a design that passes the equivalence check but has no
+  finite criterion value (a singular c-optimal design, where c'M^-c is
+  undefined) is now treated as a failure of the multiplicative algorithm, so
+  the solver falls back to the OWEA engine instead of returning `-Inf` / `NaN`
+  (seen on one Linux configuration).
+* The package is checked on Linux, macOS and Windows by GitHub Actions on
+  every push.
 
 # OWEAdesign 0.5.1
 

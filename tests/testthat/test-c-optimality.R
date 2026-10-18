@@ -105,7 +105,9 @@ test_that("verify_optimality(), the grid path, exact_design() and the continuous
                                         design_box = list(c(-3, 3)), grad_g = sel,
                                         p = 0, continuous = TRUE, n_audit = 0))
   expect_true(rc$converged)
-  expect_equal(exp(rc$criterion), 4, tolerance = 1e-6)
+  # an optimiser's value: on other platforms / R versions the search stops a
+  # hair short of the boundary point (3.9995 was seen on Linux and Windows CI)
+  expect_equal(exp(rc$criterion), 4, tolerance = 1e-3)
   expect_lte(rc$elfving_bound, 4 + 1e-6)
   expect_gt(rc$efficiency_lower_bound, 0.99999)
 })

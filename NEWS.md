@@ -13,9 +13,11 @@
   internally. A c-optimal design is often singular, and the inverse route gave
   platform-dependent nonsense for it (a value of 0, and a value below Elfving's
   lower bound, were seen on CI); if c'theta is not estimable by the design the
-  value is `Inf`. Elfving's certificate now refuses a value below the bound,
-  which no correct value can be. `optimal_design()` (grid, candidate-set and
-  continuous paths) and `verify_optimality()` report the robust value.
+  value is `Inf`. Elfving's certificate now refuses a value more than 0.1%
+  below the bound, which no correct value can be (the small margin covers a
+  support point a hair off a singular optimum). `optimal_design()` (grid,
+  candidate-set and continuous paths) and `verify_optimality()` report the
+  robust value.
 * `solver = "MA"`: a design with a non-finite criterion value is treated as a
   failure of the multiplicative algorithm, so the solver falls back to the OWEA
   engine instead of returning it.

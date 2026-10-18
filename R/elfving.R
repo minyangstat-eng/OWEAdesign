@@ -143,13 +143,17 @@
 }
 
 # Certified when the value meets the bound within eps0 -- and is not BELOW it
-# beyond rounding, which no correct value can be (V >= bound for every design):
-# such a value comes from a singular information matrix and must not be
-# trusted, let alone certified.
-.c_certified <- function(value, bound, eps0) {
+# by more than `low_tol`, which no correct value can be (V >= bound for every
+# design): such a value comes from a singular information matrix and must not
+# be trusted, let alone certified.  The margin matches .c_value_robust's
+# estimability tolerance: a design a hair off a singular optimum (a support
+# point at -0.9995 instead of -1, as L-BFGS-B leaves it on some platforms)
+# has c almost, not exactly, in the range of M, and its projected value sits
+# a few 1e-4 below the bound.
+.c_certified <- function(value, bound, eps0, low_tol = 1e-3) {
   is.finite(value) && is.finite(bound) && value > 0 &&
     value - bound <= eps0 * max(1, abs(value)) &&
-    value >= bound * (1 - 10 * eps0) - 10 * eps0
+    value >= bound * (1 - low_tol)
 }
 
 # max over the continuous region of h' A(x) h, from one start (L-BFGS-B on the

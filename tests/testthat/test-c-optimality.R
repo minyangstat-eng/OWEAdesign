@@ -131,5 +131,9 @@ test_that("the value of a c-optimal design is computed robustly from M", {
   expect_false(OWEAdesign:::.c_certified(Inf, 5.09, 1e-6))
   expect_true(OWEAdesign:::.c_certified(5.09 * (1 + 5e-7), 5.09, 1e-6))
   expect_true(OWEAdesign:::.c_certified(5.09, 5.09, 1e-6))
+  # a hair below the bound (a support point a hair off a singular optimum) is
+  # still certified; well below it is not
+  expect_true(OWEAdesign:::.c_certified(5.09 * (1 - 5e-4), 5.09, 1e-6))
+  expect_false(OWEAdesign:::.c_certified(5.09 * (1 - 5e-3), 5.09, 1e-6))
   expect_false(OWEAdesign:::.c_certified(5.09 * (1 + 1e-4), 5.09, 1e-6))
 })

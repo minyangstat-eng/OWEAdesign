@@ -140,6 +140,23 @@ test_that("solver = 'MA' handles c-optimality (rank-1 wb) gracefully", {
                step_sequence = c(0.2, 0.1), p = 0,
                grad_g = function(th) matrix(c(0, 1, -1, 0), nrow = 1))
   r_ma <- suppressWarnings(do.call(optimal_design, c(args, list(solver = "MA"))))
+  if (!is.finite(r_ma$criterion)) {
+    # diagnostics for a platform-dependent failure (seen on macOS CI only)
+    r_ow <- suppressWarnings(do.call(optimal_design, c(args, list(solver = "owea"))))
+    for (nm in c("MA", "OWEA")) {
+      r <- if (nm == "MA") r_ma else r_ow
+      cat(sprintf("\n[diag %s] criterion %s  converged %s  max_d %s  elfving_bound %s  elfving_gap %s  iterations %s\n",
+                  nm, format(r$criterion), format(r$converged), format(r$max_d),
+                  format(r$elfving_bound), format(r$elfving_gap),
+                  paste(r$iterations, collapse = "/")))
+      cat("[diag", nm, "] support / weights:\n")
+      print(cbind(as.matrix(r$support), weight = r$weights))
+      M <- tryCatch(design_information(r$support, r$weights, info_matrix = logistic_info),
+                    error = function(e) NULL)
+      if (!is.null(M)) { cat("[diag", nm, "] eigenvalues of M:\n"); print(eigen(M, symmetric = TRUE)$values) }
+      cat("[diag", nm, "] La_version / BLAS:", La_version(), extSoftVersion()[["BLAS"]], "\n")
+    }
+  }
   expect_true(is.finite(r_ma$criterion))
   expect_true(nrow(as.matrix(r_ma$support)) >= 1L)
 })

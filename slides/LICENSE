@@ -1,0 +1,21 @@
+The slides in this folder (owea_slides.tex, owea_slides.pdf,
+owea_installation.pdf, the figure scripts and the images in img/) are
+licensed under the Creative Commons Attribution 4.0 International License
+(CC BY 4.0).
+
+You are free to share (copy and redistribute in any medium or format) and
+adapt (remix, transform and build upon) this material for any purpose, even
+commercially, under the following terms: give appropriate credit to the
+author (Min Yang), provide a link to the licence, and indicate if changes
+were made.
+
+Full licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+The fonts in fonts/ are not covered by this notice and keep their own
+licences: Lato (lato-v16-latin-*.ttf) is licensed under the SIL Open Font
+License, Version 1.1 (https://scripts.sil.org/OFL); DejaVu Sans Mono
+(DejaVuSansMono.ttf) under the DejaVu Fonts License
+(https://dejavu-fonts.github.io/License.html).
+
+The OWEAdesign package in the parent directory is a separate work, licensed
+under the GNU General Public License version 3.

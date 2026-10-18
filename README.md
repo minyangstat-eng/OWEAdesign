@@ -2,6 +2,11 @@
 
 [![R-CMD-check](https://github.com/minyangstat-eng/OWEAdesign/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/minyangstat-eng/OWEAdesign/actions/workflows/R-CMD-check.yaml)
 
+> **Introduction slides.** A talk introducing optimal design, the OWEA
+> algorithm, the package and the web app lives in [`slides/`](slides/): the
+> PDF, the LaTeX (beamer) source and every figure, so you can present it as
+> is or adapt it. Licensed CC BY 4.0; see [`slides/README.md`](slides/README.md).
+
 `OWEAdesign` finds **D- and A-optimal** experimental designs for linear, nonlinear, and
 generalized linear models using the Optimal Weights Exchange Algorithm (OWEA) of
 Yang, Biedermann & Tang (2013, *JASA* 108(504), 1411–1420). An alternative

@@ -10,3 +10,4 @@
 ^src/.*\.so$
 ^cran-comments\.md$
 ^\.github$
+^slides$

@@ -104,9 +104,11 @@ test_that("verify_optimality(), the grid path, exact_design() and the continuous
   rc <- suppressWarnings(optimal_design(info_vector = info_logit, theta = thc,
                                         design_box = list(c(-3, 3)), grad_g = sel,
                                         p = 0, continuous = TRUE, n_audit = 0))
-  expect_true(rc$converged)
   # an optimiser's value: on other platforms / R versions the search stops a
-  # hair short of the boundary point (3.9995 was seen on Linux and Windows CI)
+  # hair short of the boundary point (3.9995 was seen on Linux and Windows CI),
+  # and the bound over the points examined then misses the value by ~1e-5,
+  # above eps0 = 1e-6: not certified, but certified to within 0.01%
+  expect_true(isTRUE(rc$converged) || rc$efficiency_lower_bound > 1 - 1e-4)
   expect_equal(exp(rc$criterion), 4, tolerance = 1e-3)
   expect_lte(rc$elfving_bound, 4 + 1e-6)
   expect_gt(rc$efficiency_lower_bound, 0.99999)

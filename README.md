@@ -690,7 +690,7 @@ Check the toolchain: `pkgbuild::has_build_tools(debug = TRUE)` should be `TRUE`.
 
 ```r
 # from GitHub:
-remotes::install_github("minyangstat-eng/owea")
+remotes::install_github("minyangstat-eng/OWEAdesign")
 # or from a source folder / tarball:
 install.packages("/path/to/OWEAdesign", repos = NULL, type = "source")
 ```

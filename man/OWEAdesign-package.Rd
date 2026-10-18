@@ -42,8 +42,8 @@ Yang, M., Biedermann, S. & Tang, E. (2013). On Optimal Designs
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/minyangstat-eng/owea}
-  \item Report bugs at \url{https://github.com/minyangstat-eng/owea/issues}
+  \item \url{https://github.com/minyangstat-eng/OWEAdesign}
+  \item Report bugs at \url{https://github.com/minyangstat-eng/OWEAdesign/issues}
 }
 
 }

@@ -50,6 +50,7 @@ test_that("init_method strategies reach the same optimum", {
 })
 
 test_that("init_method = 'MA' warm-starts a higher-dimensional quadratic model", {
+  skip_on_cran()   # ~24 s
   # the second-order linear model from the user report (identity link).
   args <- list(x = c(1, 2, 3, 4, 5),
                xx = c(11,12,13,14,15,22,23,24,25,33,34,35,44,45,55),
@@ -96,6 +97,7 @@ test_that("solver = 'MA' solves D-optimality directly and matches OWEA", {
 })
 
 test_that("solver = 'MA' certifies A-optimality, subset, grad_g (>= OWEA)", {
+  skip_on_cran()   # ~6 s
   # Fixed candidate grid keeps it a single, deterministic solve.
   Xg <- make_grid(c(-2, -1, -3), c(2, 1, 3), 0.5)
   base <- list(info_matrix = logistic_info, candidate_set = Xg)
@@ -128,6 +130,7 @@ test_that("solver = 'MA' matches OWEA with an existing design (n0 > 0)", {
 })
 
 test_that("solver = 'MA' handles c-optimality (rank-1 wb) gracefully", {
+  skip_on_cran()   # ~11 s
   # a single linear combination of parameters -> rank-1 wb.  c-optimal designs
   # are typically singular, which is outside MA's guaranteed-convergent class;
   # the solver must still run without error and return a finite design (falling
@@ -142,6 +145,7 @@ test_that("solver = 'MA' handles c-optimality (rank-1 wb) gracefully", {
 })
 
 test_that("total_time is the whole call, times is the solver only", {
+  skip_on_cran()   # ~6 s: builds a large grid on purpose
   # A grid big enough that building it costs more than solving on it: the two
   # numbers must then differ, and total_time must be the larger.
   f <- function(x, th) { q <- c(1, x[1], x[2], x[3]); e <- sum(q * th)

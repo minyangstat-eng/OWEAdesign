@@ -863,7 +863,7 @@ test_that("the app's time limit comes from the option, then the environment, the
 test_that("the timeout message says what stopped, how to install, and how to run locally", {
   m <- OWEAdesign:::.ui_timeout_message(60, "design")
   expect_match(m, "stopped after 60 seconds", fixed = TRUE)
-  expect_match(m, 'remotes::install_github("minyangstat-eng/owea")', fixed = TRUE)
+  expect_match(m, 'remotes::install_github("minyangstat-eng/OWEAdesign")', fixed = TRUE)
   expect_match(m, "run_owea_app(time_limit = Inf)", fixed = TRUE)
   expect_match(m, "R code at the bottom of this page", fixed = TRUE)
   expect_gte(length(strsplit(m, "\n\n", fixed = TRUE)[[1]]), 3L)   # paragraphs

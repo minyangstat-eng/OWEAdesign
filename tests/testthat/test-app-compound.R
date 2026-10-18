@@ -182,6 +182,7 @@ test_that(".uic_verify_points counts the shared grid at the finest step", {
 # ---- the server ------------------------------------------------------------
 
 app_env_c <- function() {
+  testthat::skip_on_cran()   # the server tests take ~25 s in all; run locally (NOT_CRAN=true)
   dir <- system.file("shiny", "owea-app", package = "OWEAdesign")
   testthat::skip_if(!nzchar(dir) || !file.exists(file.path(dir, "app.R")),
                     "the bundled app is not on disk")

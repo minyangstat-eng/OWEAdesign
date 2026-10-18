@@ -38,5 +38,5 @@ Suggests:
     lpSolve
 RoxygenNote: 7.3.2
 NeedsCompilation: yes
-URL: https://github.com/minyangstat-eng/owea
-BugReports: https://github.com/minyangstat-eng/owea/issues
+URL: https://github.com/minyangstat-eng/OWEAdesign
+BugReports: https://github.com/minyangstat-eng/OWEAdesign/issues

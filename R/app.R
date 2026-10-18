@@ -967,7 +967,7 @@ run_owea_app <- function(launch.browser = TRUE, time_limit = 60, ...) {
   install <- paste0(
     "To run it on your own computer, install R (free, from ",
     "https://cran.r-project.org) and then the OWEAdesign package by typing in R: ",
-    "install.packages(\"remotes\"); remotes::install_github(\"minyangstat-eng/owea\"). ",
+    "install.packages(\"remotes\"); remotes::install_github(\"minyangstat-eng/OWEAdesign\"). ",
     "The R code at the bottom of this page reproduces exactly what you set up here",
     if (what == "design") "" else ", this step included",
     ": copy it (or download it), paste it into R and run it.")

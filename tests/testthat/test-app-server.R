@@ -3,6 +3,7 @@
 # The pure translators behind it are tested in test-app.R.
 
 app_env <- function() {
+  testthat::skip_on_cran()   # the server tests take ~20 s in all; run locally (NOT_CRAN=true)
   dir <- system.file("shiny", "owea-app", package = "OWEAdesign")
   testthat::skip_if(!nzchar(dir) || !file.exists(file.path(dir, "app.R")),
                     "the bundled app is not on disk")

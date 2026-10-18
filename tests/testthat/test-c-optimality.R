@@ -111,3 +111,25 @@ test_that("verify_optimality(), the grid path, exact_design() and the continuous
   expect_lte(rc$elfving_bound, 4 + 1e-6)
   expect_gt(rc$efficiency_lower_bound, 0.99999)
 })
+
+test_that("the value of a c-optimal design is computed robustly from M", {
+  # nonsingular M: the eigen route equals c' M^-1 c
+  set.seed(5)
+  A <- matrix(rnorm(16), 4); M <- crossprod(A) + diag(4); cc <- c(1, -1, 0.5, 2)
+  expect_equal(OWEAdesign:::.c_value_robust(M, cc),
+               as.numeric(crossprod(cc, solve(M, cc))), tolerance = 1e-10)
+  # singular M with c in its range: finite, the pseudo-inverse value
+  f <- c(1, -1); Ms <- tcrossprod(f)                 # rank one, one-point design
+  # (f f')^+ = f f' / (f'f)^2, so c = a f gives V = a^2
+  expect_equal(OWEAdesign:::.c_value_robust(Ms, f), 1, tolerance = 1e-12)
+  expect_equal(OWEAdesign:::.c_value_robust(Ms, 2 * f), 4, tolerance = 1e-12)
+  # c outside the range: the design does not estimate c'theta
+  expect_identical(OWEAdesign:::.c_value_robust(Ms, c(1, 1)), Inf)
+  # a value below Elfving's bound is never certified, a matching one is
+  expect_false(OWEAdesign:::.c_certified(4, 5.09, 1e-6))
+  expect_false(OWEAdesign:::.c_certified(0, 5.09, 1e-6))
+  expect_false(OWEAdesign:::.c_certified(Inf, 5.09, 1e-6))
+  expect_true(OWEAdesign:::.c_certified(5.09 * (1 + 5e-7), 5.09, 1e-6))
+  expect_true(OWEAdesign:::.c_certified(5.09, 5.09, 1e-6))
+  expect_false(OWEAdesign:::.c_certified(5.09 * (1 + 1e-4), 5.09, 1e-6))
+})

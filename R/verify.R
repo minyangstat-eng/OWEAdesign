@@ -301,10 +301,13 @@ verify_optimality <- function(support, weights = NULL,
     value <- if (p == 0L) exp(crit) else crit
     cert  <- if (cont_mode)
       .c_certificate_cont(ev, cvec, infor0, lo, hi, is_factor, nlevels, support,
-                          value, tol)
+                          value, tol, M = unname(M))
     else
       .c_certificate(cvec, info_mode, scaled, infor0, k, value, tol,
                      M = unname(M))
+    # the certificate recomputes the value robustly from M (a singular design
+    # defeats the inverse behind criterion_cpp); report that value
+    if (!is.na(cert$value)) crit <- if (p == 0L) log(cert$value) else cert$value
   }
 
   is_opt <- if (criterion_only)

@@ -7,11 +7,18 @@
   `library(OWEAdesign)`; the function names (`optimal_design()`, `owea()`,
   `run_owea_app()`, ...) are the same. The earlier entries below were released
   under the old name.
-* `solver = "MA"`: a design that passes the equivalence check but has no
-  finite criterion value (a singular c-optimal design, where c'M^-c is
-  undefined) is now treated as a failure of the multiplicative algorithm, so
-  the solver falls back to the OWEA engine instead of returning `-Inf` / `NaN`
-  (seen on one Linux configuration).
+* c-optimality: the value c'M^-c of a design is now computed from the
+  eigen-decomposition of its information matrix (new internal
+  `.c_value_robust()`), not through the ridge / pseudo-inverse the engine uses
+  internally. A c-optimal design is often singular, and the inverse route gave
+  platform-dependent nonsense for it (a value of 0, and a value below Elfving's
+  lower bound, were seen on CI); if c'theta is not estimable by the design the
+  value is `Inf`. Elfving's certificate now refuses a value below the bound,
+  which no correct value can be. `optimal_design()` (grid, candidate-set and
+  continuous paths) and `verify_optimality()` report the robust value.
+* `solver = "MA"`: a design with a non-finite criterion value is treated as a
+  failure of the multiplicative algorithm, so the solver falls back to the OWEA
+  engine instead of returning it.
 * The package is checked on Linux, macOS and Windows by GitHub Actions on
   every push.
 

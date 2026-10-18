@@ -441,7 +441,14 @@ optimal_design <- function(design_box = NULL, step_sequence = NULL,
     cert <- .c_certificate(cvec, info_mode, scaled, infor0, k,
                            c_value(cand$criterion), eps0, M = M)
     cand$elfving   <- cert
-    cand$converged <- isTRUE(cand$converged) || isTRUE(cert$certified)
+    # the certificate recomputes the value robustly from M: the engine's value
+    # goes through a ridge / pseudo-inverse that misreports a singular design
+    # (platform-dependent; 0 and a value below the bound were seen on CI).  A
+    # non-finite robust value means c'theta is not estimable by this design.
+    if (!is.na(cert$value))
+      cand$criterion <- if (p == 0L) log(cert$value) else cert$value
+    cand$converged <- (isTRUE(cand$converged) && is.finite(cand$criterion)) ||
+                      isTRUE(cert$certified)
     cand
   }
 
@@ -707,15 +714,20 @@ optimal_design <- function(design_box = NULL, step_sequence = NULL,
     cs <- .cont_solve(ev, p, wb_use, infor0, ms, box_lo, box_hi, is_factor, nlevels,
                       init_sup, init_w, eps0, max_iter, n_starts, n_audit,
                       merge_tol, verbose)
-    c_cert <- NULL
-    if (is_c) {                                      # Elfving's bound over the region
-      c_cert <- .c_certificate_cont(ev, cvec, infor0, box_lo, box_hi, is_factor,
-                                    nlevels, cs$support, c_value(cs$criterion), eps0)
-      cs$converged <- isTRUE(cs$converged) || isTRUE(c_cert$certified)
-    }
     info_out <- infor0 + .opt_infor_from_support(cs$support, cs$weights, b,
                                                  info_mode, info_vector,
                                                  info_matrix, theta_use, k)
+    c_cert <- NULL
+    if (is_c) {                                      # Elfving's bound over the region
+      c_cert <- .c_certificate_cont(ev, cvec, infor0, box_lo, box_hi, is_factor,
+                                    nlevels, cs$support, c_value(cs$criterion), eps0,
+                                    M = info_out)
+      # the robust value from M replaces the solver's (see certify_c)
+      if (!is.na(c_cert$value))
+        cs$criterion <- if (p == 0L) log(c_cert$value) else c_cert$value
+      cs$converged <- (isTRUE(cs$converged) && is.finite(cs$criterion)) ||
+                      isTRUE(c_cert$certified)
+    }
     dimnames(info_out) <- list(coef_names, coef_names)
     out <- list(support = cs$support, weights = cs$weights,
                 criterion = cs$criterion, max_d = cs$max_d,

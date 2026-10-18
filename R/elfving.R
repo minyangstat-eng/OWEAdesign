@@ -39,17 +39,48 @@
   sol$solution[seq_len(k)] - sol$solution[k + seq_len(k)]
 }
 
+# The value V = c' M^- c of a design from its combined information matrix M,
+# computed from the eigen-decomposition rather than through a (ridge- or
+# pseudo-) inverse.  A c-optimal design is often singular, and then the inverse
+# the engine uses -- Cholesky, else an increasing ridge, else a pseudo-inverse
+# -- gives a value that depends on where the platform's LAPACK gives up on the
+# nearly singular matrix (a value of 0 and a value below Elfving's lower bound
+# were both seen on CI).  Here: eigenvalues below rel_tol * max are the null
+# space; if c has a non-negligible component there the design does not
+# estimate c'theta and V is +Inf; otherwise V = sum_j (v_j'c)^2 / lambda_j
+# over the non-null eigenpairs, which equals c' M^-1 c for a nonsingular M.
+.c_value_robust <- function(M, cvec, rel_tol = 1e-10, est_tol = 1e-6) {
+  M <- as.matrix(M); M <- 0.5 * (M + t(M)); cvec <- as.numeric(cvec)
+  e <- eigen(M, symmetric = TRUE)
+  lam <- e$values; proj <- as.numeric(crossprod(e$vectors, cvec))
+  if (!all(is.finite(lam)) || !all(is.finite(proj))) return(NA_real_)
+  lmax <- max(lam)
+  if (!(lmax > 0)) return(Inf)
+  keep <- lam > rel_tol * lmax
+  null_part <- sum(proj[!keep]^2)
+  if (null_part > est_tol * sum(cvec^2)) return(Inf)
+  sum(proj[keep]^2 / lam[keep])
+}
+
 # The certificate on a FINITE candidate set.
 #   cvec      : the vector c (length k)
 #   info_data : the b-scaled candidate information (k x N vectors, or k^2 x N)
 #   infor0    : a * I_xi0 (k x k; zeros for a single-stage design)
-#   value     : the design's value V = c' M^- c
-#   M         : optional combined information of the design (for the M^+ c start)
-# Returns list(bound, h, gap = V - bound, certified, efficiency = min(1, bound/V)).
+#   value     : the design's value V = c' M^- c as the solver reported it
+#   M         : optional combined information of the design; when given, the
+#               value is recomputed robustly from it (.c_value_robust) and
+#               that value is the one certified and returned
+# Returns list(bound, h, gap = V - bound, certified, efficiency = min(1, bound/V),
+# value = V).  A value below the bound (impossible for a correct value) is
+# never certified: it means the reported value is numerically meaningless.
 .c_certificate <- function(cvec, info_mode, info_data, infor0, k, value,
                            eps0 = 1e-6, M = NULL) {
   cvec <- as.numeric(cvec); info_data <- as.matrix(info_data)
   infor0 <- as.matrix(infor0)
+  if (!is.null(M)) {
+    vr <- .c_value_robust(M, cvec)
+    if (!is.na(vr)) value <- vr
+  }
   quad_max <- function(h) {                          # max_i h' A_i h
     h <- as.numeric(h)
     if (info_mode == 0L) max(as.numeric(crossprod(info_data, h))^2)
@@ -105,9 +136,20 @@
   h <- hs[[best]]; bound <- 1 / Ds[best]
   gap <- value - bound
   list(bound = bound, h = h, gap = gap,
-       certified = is.finite(gap) && gap <= eps0 * max(1, abs(value)),
+       certified = .c_certified(value, bound, eps0),
        efficiency = if (is.finite(bound) && is.finite(value) && value > 0)
-                      min(1, bound / value) else NA_real_)
+                      min(1, bound / value) else NA_real_,
+       value = value)
+}
+
+# Certified when the value meets the bound within eps0 -- and is not BELOW it
+# beyond rounding, which no correct value can be (V >= bound for every design):
+# such a value comes from a singular information matrix and must not be
+# trusted, let alone certified.
+.c_certified <- function(value, bound, eps0) {
+  is.finite(value) && is.finite(bound) && value > 0 &&
+    value - bound <= eps0 * max(1, abs(value)) &&
+    value >= bound * (1 - 10 * eps0) - 10 * eps0
 }
 
 # max over the continuous region of h' A(x) h, from one start (L-BFGS-B on the
@@ -136,7 +178,8 @@
 # of h' A(x) h is refined over the region by multi-start L-BFGS-B.  As every
 # other check on the continuous path, the maximum is over the points examined.
 .c_certificate_cont <- function(ev, cvec, infor0, lo, hi, is_factor, nlevels,
-                                support, value, eps0 = 1e-6, n_points = 2000L) {
+                                support, value, eps0 = 1e-6, n_points = 2000L,
+                                M = NULL) {
   k <- ev$k; d <- length(lo)
   G <- .cont_initial_grid(lo, hi, is_factor, nlevels, 3L)
   U <- matrix(0, n_points, d)
@@ -145,7 +188,8 @@
               else stats::runif(n_points, lo[j], hi[j])
   S <- rbind(as.matrix(support), G, U)
   C <- ev$cols(S)
-  cert <- .c_certificate(cvec, ev$info_mode, C, infor0, k, value, eps0)
+  cert <- .c_certificate(cvec, ev$info_mode, C, infor0, k, value, eps0, M = M)
+  value <- cert$value                     # the robust value when M was given
   h <- cert$h
   q <- if (ev$info_mode == 0L) as.numeric(crossprod(C, h))^2
        else as.numeric(crossprod(C, as.numeric(tcrossprod(h))))
@@ -160,8 +204,8 @@
   bound <- if (is.finite(D) && D > 0) 1 / D else NA_real_
   gap <- value - bound
   list(bound = bound, h = h, gap = gap,
-       certified = is.finite(gap) && gap <= eps0 * max(1, abs(value)),
+       certified = .c_certified(value, bound, eps0),
        efficiency = if (is.finite(bound) && is.finite(value) && value > 0)
                       min(1, bound / value) else NA_real_,
-       heuristic = TRUE)
+       value = value, heuristic = TRUE)
 }

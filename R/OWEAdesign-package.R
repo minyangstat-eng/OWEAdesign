@@ -1,4 +1,4 @@
-#' owea: Optimal Weights Exchange Algorithm for approximate optimal designs
+#' OWEAdesign: Optimal Weights Exchange Algorithm for approximate optimal designs
 #'
 #' Finds D- and A-optimal approximate designs for linear, nonlinear and
 #' generalized linear models with the Optimal Weights Exchange Algorithm (OWEA)
@@ -31,7 +31,7 @@
 #'   for Nonlinear Models: A General and Efficient Algorithm. \emph{JASA}
 #'   108(504), 1411-1420.
 #'
-#' @useDynLib owea, .registration = TRUE
+#' @useDynLib OWEAdesign, .registration = TRUE
 #' @importFrom Rcpp evalCpp
 #' @keywords internal
 "_PACKAGE"

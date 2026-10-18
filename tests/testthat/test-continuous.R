@@ -98,7 +98,7 @@ test_that("analytic Jacobian and vectorised evaluation of formula-style models a
   fi <- model_info_vector(list(x = c(-1, 1)), link = "identity", x = 1, xx = 11)
   expect_equal(as.numeric(attr(fi, "jacobian")(0.4, NULL)), c(0, 1, 0.8))
   # the attributes survive the internal normalisation of a one-argument model
-  fn <- owea:::.normalize_info_vector(fi, NULL)
+  fn <- OWEAdesign:::.normalize_info_vector(fi, NULL)
   expect_true(is.function(attr(fn, "jacobian")))
   expect_true(is.function(attr(fn, "vectorized")))
 })

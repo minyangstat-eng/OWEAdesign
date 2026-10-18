@@ -41,12 +41,12 @@ test_that("the certificate is a valid lower bound and is tight for any h at the 
     expect_lte(1 / max((F %*% h)^2), 4 + 1e-12)
   }
   # the internal certificate finds the tight h
-  cert <- owea:::.c_certificate(cv, 0L, t(F), matrix(0, 2, 2), 2L, value = 4)
+  cert <- OWEAdesign:::.c_certificate(cv, 0L, t(F), matrix(0, 2, 2), 2L, value = 4)
   expect_equal(cert$bound, 4, tolerance = 1e-8)
   expect_true(cert$certified)
   expect_equal(sum(cert$h * cv), 1, tolerance = 1e-10)
   # a non-optimal design is not certified, and its efficiency bound is < 1
-  cert2 <- owea:::.c_certificate(cv, 0L, t(F), matrix(0, 2, 2), 2L, value = 5)
+  cert2 <- OWEAdesign:::.c_certificate(cv, 0L, t(F), matrix(0, 2, 2), 2L, value = 5)
   expect_false(cert2$certified)
   expect_equal(cert2$efficiency, 4 / 5, tolerance = 1e-8)
 })

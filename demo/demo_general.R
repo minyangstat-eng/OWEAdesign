@@ -11,7 +11,7 @@
 #   - the step_sequence
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---- 1. User supplies the information matrix ------------------------------
 # Logistic GLM:  I_x = nu(x) * q(x) q(x)^T  with  nu(eta) = e^eta / (1+e^eta)^2.

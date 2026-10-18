@@ -15,7 +15,7 @@
 #   stages only scan small neighbourhoods.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---- 1. User supplies the information matrix ------------------------------
 beta <- c(1.0, -0.5, 0.5, 1.0)

@@ -5,3 +5,6 @@
 ^\.gitignore$
 ^_.*\.R$
 ^.*\.tar\.gz$
+^src/.*\.o$
+^src/.*\.dll$
+^src/.*\.so$

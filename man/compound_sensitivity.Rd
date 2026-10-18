@@ -3,24 +3,22 @@
 \alias{compound_sensitivity}
 \title{Compound sensitivity function of a given design}
 \usage{
-compound_sensitivity(object, components, candidate_set, factor_levels = NULL,
-                     xi0_points = NULL, xi0_weights = numeric(0),
-                     n0 = 0, n1 = 1, ...)
+compound_sensitivity(object, components, candidate_set, weights = NULL, ...)
 }
 \arguments{
-\item{object}{a \code{"compound_design"} result.}
+\item{object}{a \code{"compound_design"} result, or an \eqn{m \times d}
+support matrix (then supply \code{weights}).}
 
 \item{components}{the component list used to build \code{object}, exactly as in
 \code{\link{compound_design}}.}
 
 \item{candidate_set}{an \eqn{n \times d} matrix of points to scan.}
 
-\item{factor_levels}{factor specification for \code{candidate_set}.}
+\item{weights}{weights, when \code{object} is a bare support matrix.}
 
-\item{xi0_points, xi0_weights, n0, n1}{the existing design, as in
-\code{\link{compound_design}}.}
-
-\item{...}{ignored.}
+\item{...}{further arguments passed to \code{\link{compound_criterion}}
+(\code{alpha}, \code{psi_star}, \code{efficiency}, \code{factor_levels},
+\code{xi0_points}, \code{xi0_weights}, \code{n0}, \code{n1}, ...).}
 }
 \value{
 A list with \code{sensitivity} (one value per candidate), \code{max_d},

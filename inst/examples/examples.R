@@ -1,10 +1,10 @@
 # =====================================================================
 #  examples.R -- worked examples for the information-VECTOR (fast) API.
 #
-#  Run with:  source(system.file("examples", "examples.R", package = "owea"))
+#  Run with:  source(system.file("examples", "examples.R", package = "OWEAdesign"))
 # =====================================================================
 
-library(owea)
+library(OWEAdesign)
 
 cat("\n")
 cat("=====================================================================\n")

@@ -35,8 +35,10 @@ as \code{function(x, theta)}. For a model spec that needs \code{theta}
 (logit/loglinear), a missing \code{theta} is drawn from \eqn{N(0,1)} with a
 warning.}
 
-\item{link, f, x, fx, ff, xx, intercept, coding}{optional formula-style model spec
-(as in \code{\link{optimal_design}}); an alternative to \code{infor_vec}.}
+\item{link, f, x, fx, ff, xx, intercept, coding, ncat}{optional formula-style
+model spec (as in \code{\link{optimal_design}}; \code{ncat} is the number of
+response categories of a \code{"multinomial"} or \code{"cumulative"} model); an
+alternative to \code{infor_vec}.}
 
 \item{factor_levels}{optional integer vector marking factor columns of
 \code{X}; when omitted with a model spec, factor columns are auto-detected

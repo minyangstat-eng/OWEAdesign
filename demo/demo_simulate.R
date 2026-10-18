@@ -8,7 +8,7 @@
 # of the estimates with the design-based large-sample covariance M^{-1}/N.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ===========================================================================
 # (A) The exact_design workflow: design -> exact allocation -> simulate + fit

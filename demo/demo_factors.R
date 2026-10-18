@@ -11,7 +11,7 @@
 # covariates as integer levels.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---------------------------------------------------------------------------
 # (1) The 2^k logistic screening model of Yang, Chen & Yang (2026), Example 3,

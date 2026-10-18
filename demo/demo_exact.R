@@ -13,7 +13,7 @@
 # (info_matrix / info_vector), the design region, and the sample size n.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---- A. Simple linear regression on [-1, 1] (D-optimal) -------------------
 # The approximate D-optimal design puts weight 1/2 at each of -1 and +1, so for

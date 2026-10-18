@@ -7,10 +7,10 @@
 #  appro_opt(X=, infor_vec=, theta=), and appro_opt_seq().
 #
 #  Run with:
-#    source(system.file("examples", "example_logistic3d.R", package = "owea"))
+#    source(system.file("examples", "example_logistic3d.R", package = "OWEAdesign"))
 # =====================================================================
 
-library(owea)
+library(OWEAdesign)
 
 # ---------------------------------------------------------------------
 #  The model: logistic regression with linear predictor

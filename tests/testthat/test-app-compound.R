@@ -6,9 +6,9 @@
 # two shared continuous covariates, coarse grid so the tests stay quick
 covs2 <- function(steps = "0.5")
   list(list(name = "x1", type = "continuous", lo = -2, hi = 2,
-            steps = owea:::.ui_parse_steps(steps)),
+            steps = OWEAdesign:::.ui_parse_steps(steps)),
        list(name = "x2", type = "continuous", lo = -2, hi = 2,
-            steps = owea:::.ui_parse_steps(steps)))
+            steps = OWEAdesign:::.ui_parse_steps(steps)))
 
 # three genuinely different models over those covariates
 comps3 <- function()
@@ -21,11 +21,11 @@ comps3 <- function()
 # ---- the step graph --------------------------------------------------------
 
 test_that(".uic_wizard_steps is the compound chain", {
-  s <- owea:::.uic_wizard_steps()
+  s <- OWEAdesign:::.uic_wizard_steps()
   expect_equal(s, c("cmp_cov", "cmp_models", "cmp_options", "cmp_review",
                     "cmp_results"))
   # and the classical chain is NOT disturbed by the compound branch existing
-  expect_equal(owea:::.ui_wizard_steps("identity", "none"),
+  expect_equal(OWEAdesign:::.ui_wizard_steps("identity", "none"),
                c("model", "start", "criterion", "design_type", "review",
                  "results"))
 })
@@ -33,12 +33,12 @@ test_that(".uic_wizard_steps is the compound chain", {
 # ---- specs -----------------------------------------------------------------
 
 test_that(".uic_specs builds one spec per component over shared covariates", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
   expect_length(sp, 3L)
   # every component sees the SAME design region
   for (s in sp) expect_equal(names(s$design_box), c("x1", "x2"))
   # but its own model: 3, 4 and 3 parameters
-  expect_equal(vapply(sp, function(s) length(owea:::.ui_coef_names(s)),
+  expect_equal(vapply(sp, function(s) length(OWEAdesign:::.ui_coef_names(s)),
                       integer(1)), c(3L, 4L, 3L))
   expect_equal(sp[[1]]$link, "logit")
   expect_equal(sp[[3]]$link, "loglinear")
@@ -47,32 +47,32 @@ test_that(".uic_specs builds one spec per component over shared covariates", {
 })
 
 test_that(".uic_specs rejects an empty component list", {
-  expect_error(owea:::.uic_specs(covs2(), list()), "at least one component")
+  expect_error(OWEAdesign:::.uic_specs(covs2(), list()), "at least one component")
 })
 
 # ---- validation ------------------------------------------------------------
 
 test_that(".uic_check accepts a good setup and names the bad component", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  expect_null(owea:::.uic_check(sp, comps3(), c(0.4, 0.35, 0.25)))
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  expect_null(OWEAdesign:::.uic_check(sp, comps3(), c(0.4, 0.35, 0.25)))
 
   bad <- comps3(); bad[[2]]$theta <- c(1, 2)            # needs 4, given 2
-  expect_match(owea:::.uic_check(sp, bad, c(1, 1, 1)), "^m2: ")
-  expect_match(owea:::.uic_check(sp, bad, c(1, 1, 1)), "4 parameter")
+  expect_match(OWEAdesign:::.uic_check(sp, bad, c(1, 1, 1)), "^m2: ")
+  expect_match(OWEAdesign:::.uic_check(sp, bad, c(1, 1, 1)), "4 parameter")
 
   bad2 <- comps3(); bad2[[3]]$subset <- c(2, 9)         # out of range for k = 3
-  expect_match(owea:::.uic_check(sp, bad2, c(1, 1, 1)), "m3.*1\\.\\.3")
+  expect_match(OWEAdesign:::.uic_check(sp, bad2, c(1, 1, 1)), "m3.*1\\.\\.3")
 
-  expect_match(owea:::.uic_check(sp, comps3(), c(1, 1)), "one weight per")
-  expect_match(owea:::.uic_check(sp, comps3(), c(-1, 1, 1)), "nonnegative")
-  expect_match(owea:::.uic_check(sp, comps3(), c(0, 0, 0)), "cannot all be zero")
+  expect_match(OWEAdesign:::.uic_check(sp, comps3(), c(1, 1)), "one weight per")
+  expect_match(OWEAdesign:::.uic_check(sp, comps3(), c(-1, 1, 1)), "nonnegative")
+  expect_match(OWEAdesign:::.uic_check(sp, comps3(), c(0, 0, 0)), "cannot all be zero")
 })
 
 # ---- the argument assembler ------------------------------------------------
 
 test_that(".uic_solver_args shapes the design and verify targets", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
 
   expect_equal(names(a$design_box), c("x1", "x2"))
   expect_equal(a$step_sequence, sp[[1]]$step_sequence)
@@ -89,7 +89,7 @@ test_that(".uic_solver_args shapes the design and verify targets", {
   expect_equal(a$components[[1]]$coding, "zero-sum")
 
   # verify wants a single step, not a sequence, and reuses psi_star
-  v <- owea:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
+  v <- OWEAdesign:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
                                psi_star = c(1, 2, 3))
   expect_equal(v$step, sp[[1]]$finest)
   expect_null(v$step_sequence)
@@ -97,13 +97,13 @@ test_that(".uic_solver_args shapes the design and verify targets", {
 })
 
 test_that(".uic_solver_args omits xi0_* when there is no existing design", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "design")
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design")
   expect_false(any(c("xi0_points", "xi0_weights", "n0", "n1") %in% names(a)))
   # ... and passes them through when there is one
   ex <- list(points = rbind(c(-2, -2), c(2, 2)), weights = c(0.5, 0.5),
              n0 = 10, n1 = 20)
-  b <- owea:::.uic_solver_args(sp, comps3(), "design", existing = ex)
+  b <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design", existing = ex)
   expect_equal(b$n0, 10L)
   expect_equal(b$n1, 20L)
   expect_equal(sum(b$xi0_weights), 1)
@@ -111,22 +111,22 @@ test_that(".uic_solver_args omits xi0_* when there is no existing design", {
 })
 
 test_that(".uic_solver_args demands assumed values for a local model", {
-  sp  <- owea:::.uic_specs(covs2(), comps3())
+  sp  <- OWEAdesign:::.uic_specs(covs2(), comps3())
   bad <- comps3(); bad[[1]]$theta <- NULL
-  expect_error(owea:::.uic_solver_args(sp, bad, "design"),
+  expect_error(OWEAdesign:::.uic_solver_args(sp, bad, "design"),
                "assumed parameter value")
   # ... but not for the identity link
   ci  <- list(list(name = "lin", link = "identity", p = 0))
-  spi <- owea:::.uic_specs(covs2(), ci)
-  ai  <- owea:::.uic_solver_args(spi, ci, "design")
+  spi <- OWEAdesign:::.uic_specs(covs2(), ci)
+  ai  <- OWEAdesign:::.uic_solver_args(spi, ci, "design")
   expect_null(ai$components[[1]]$theta)
 })
 
 # ---- parity with a direct compound_design() call ---------------------------
 
 test_that(".uic_solver_args reproduces a direct compound_design() call", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
   r  <- do.call(compound_design, a)
 
   d <- compound_design(
@@ -146,11 +146,11 @@ test_that(".uic_solver_args reproduces a direct compound_design() call", {
 # ---- results helpers -------------------------------------------------------
 
 test_that("the results tables have the shape the app renders", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
   r  <- do.call(compound_design,
-                owea:::.uic_solver_args(sp, comps3(), "design",
+                OWEAdesign:::.uic_solver_args(sp, comps3(), "design",
                                         alpha = c(.4, .35, .25)))
-  s <- owea:::.uic_summary_table(r)
+  s <- OWEAdesign:::.uic_summary_table(r)
   expect_equal(rownames(s), c("m1", "m2", "m3"))
   # per-component values on the optimal_design() scale (0.4.0), not Psi
   expect_true(all(c("alpha", "type", "criterion", "optimal", "efficiency_lower_bound")
@@ -160,29 +160,29 @@ test_that("the results tables have the shape the app renders", {
   expect_equal(s$optimal,   signif(as.numeric(r$component_criterion_star), 7))
   expect_true(all(s$criterion >= s$optimal - 1e-8))   # smaller is better
 
-  ct <- owea:::.uic_cross_table(r)
+  ct <- OWEAdesign:::.uic_cross_table(r)
   expect_equal(dim(ct), c(4L, 3L))
   expect_equal(rownames(ct)[4], "THIS DESIGN")
 
   # raw weighting runs no reference solves, so there is no cross table
   rr <- do.call(compound_design,
-                owea:::.uic_solver_args(sp, comps3(), "design",
+                OWEAdesign:::.uic_solver_args(sp, comps3(), "design",
                                         alpha = c(.4, .35, .25),
                                         efficiency = FALSE))
-  expect_null(owea:::.uic_cross_table(rr))
-  expect_false("efficiency_lower_bound" %in% names(owea:::.uic_summary_table(rr)))
+  expect_null(OWEAdesign:::.uic_cross_table(rr))
+  expect_false("efficiency_lower_bound" %in% names(OWEAdesign:::.uic_summary_table(rr)))
 })
 
 test_that(".uic_verify_points counts the shared grid at the finest step", {
-  sp <- owea:::.uic_specs(covs2("0.5, 0.25"), comps3())
-  expect_equal(owea:::.uic_verify_points(sp), owea:::.ui_verify_points(sp[[1]]))
-  expect_equal(owea:::.uic_verify_points(sp), 17 * 17)     # (4/0.25 + 1)^2
+  sp <- OWEAdesign:::.uic_specs(covs2("0.5, 0.25"), comps3())
+  expect_equal(OWEAdesign:::.uic_verify_points(sp), OWEAdesign:::.ui_verify_points(sp[[1]]))
+  expect_equal(OWEAdesign:::.uic_verify_points(sp), 17 * 17)     # (4/0.25 + 1)^2
 })
 
 # ---- the server ------------------------------------------------------------
 
 app_env_c <- function() {
-  dir <- system.file("shiny", "owea-app", package = "owea")
+  dir <- system.file("shiny", "owea-app", package = "OWEAdesign")
   testthat::skip_if(!nzchar(dir) || !file.exists(file.path(dir, "app.R")),
                     "the bundled app is not on disk")
   e <- new.env(parent = globalenv())
@@ -238,7 +238,7 @@ test_that("the compound branch reaches the solver and converges", {
     set_compound(session)
     expect_length(cmp_specs(), 2L)
     expect_equal(vapply(cmp_specs(),
-                        function(s) length(owea:::.ui_coef_names(s)), integer(1)),
+                        function(s) length(OWEAdesign:::.ui_coef_names(s)), integer(1)),
                  c(3L, 4L))
     expect_null(step_error("cmp_cov"))
     expect_null(step_error("cmp_models"))
@@ -334,43 +334,43 @@ test_that("raw weighting drops the reference solves", {
 # ---- exact designs and the simulation study --------------------------------
 
 test_that(".uic_solver_args shapes the exact target", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25),
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25),
                                 n = 25)
   expect_equal(a$n, 25L)
   expect_equal(a$step_sequence, sp[[1]]$step_sequence)   # exact still refines
-  expect_error(owea:::.uic_solver_args(sp, comps3(), "exact"), "number of runs")
+  expect_error(OWEAdesign:::.uic_solver_args(sp, comps3(), "exact"), "number of runs")
 })
 
 test_that(".uic_simulate runs each component under its own model", {
-  sp  <- owea:::.uic_specs(covs2(), comps3())
+  sp  <- OWEAdesign:::.uic_specs(covs2(), comps3())
   sup <- rbind(c(-2, -2), c(2, -2), c(-2, 2), c(2, 2), c(0, 0))
   cnt <- c(8L, 8L, 8L, 8L, 8L)
-  s <- owea:::.uic_simulate(sp, comps3(), support = sup, counts = cnt,
+  s <- OWEAdesign:::.uic_simulate(sp, comps3(), support = sup, counts = cnt,
                             nsim = 30L, seed = 1)
   expect_length(s, 3L)
   for (j in seq_len(3)) {
     expect_false(inherits(s[[j]], "error"))
     # each component is fitted with ITS OWN model, so its own parameter count
-    expect_length(s[[j]]$mse, length(owea:::.ui_coef_names(sp[[j]])))
+    expect_length(s[[j]]$mse, length(OWEAdesign:::.ui_coef_names(sp[[j]])))
     expect_equal(s[[j]]$N, sum(cnt))
     expect_gt(s[[j]]$n_converged, 0L)
   }
   expect_equal(vapply(s, function(z) length(z$mse), integer(1)), c(3L, 4L, 3L))
-  m <- owea:::.uic_sim_mse(s[[2]])
+  m <- OWEAdesign:::.uic_sim_mse(s[[2]])
   expect_length(m, 4L)
-  expect_equal(names(m), owea:::.ui_coef_names(sp[[2]]))
+  expect_equal(names(m), OWEAdesign:::.ui_coef_names(sp[[2]]))
   expect_true(all(m >= 0))
 })
 
 test_that(".uic_simulate reports a failing component without losing the rest", {
-  sp  <- owea:::.uic_specs(covs2(), comps3())
+  sp  <- OWEAdesign:::.uic_specs(covs2(), comps3())
   bad <- comps3(); bad[[1]]$theta <- c(1, 2)          # wrong length for k = 3
   sup <- rbind(c(-2, -2), c(2, 2), c(0, 0)); cnt <- c(5L, 5L, 5L)
-  s <- owea:::.uic_simulate(sp, bad, support = sup, counts = cnt,
+  s <- OWEAdesign:::.uic_simulate(sp, bad, support = sup, counts = cnt,
                             nsim = 10L, seed = 1)
   expect_true(inherits(s[[1]], "error"))
-  expect_null(owea:::.uic_sim_mse(s[[1]]))
+  expect_null(OWEAdesign:::.uic_sim_mse(s[[1]]))
   expect_false(inherits(s[[2]], "error"))             # the others still ran
 })
 
@@ -410,8 +410,8 @@ test_that("the app's simulation study runs per component", {
     session$setInputs(cmp_run_sim = 1)
     s <- rv$cmp_sim$design
     expect_length(s, 2L)                       # one result per component
-    expect_length(owea:::.uic_sim_mse(s[[1]]), 3L)
-    expect_length(owea:::.uic_sim_mse(s[[2]]), 4L)
+    expect_length(OWEAdesign:::.uic_sim_mse(s[[1]]), 3L)
+    expect_length(OWEAdesign:::.uic_sim_mse(s[[2]]), 4L)
 
     session$setInputs(cmp_run_srs = 1)
     expect_length(rv$cmp_sim$srs, 2L)
@@ -439,7 +439,7 @@ test_that("the app's simulation study runs per component", {
         "Random / This design (median SE)"),
       function(s) grepl(s, tbl, fixed = TRUE), logical(1))))
     expect_false(grepl("This design / This design", tbl, fixed = TRUE))
-    R <- owea:::.ui_sim_ratio(m1[["Mean squared error"]], "This design")
+    R <- OWEAdesign:::.ui_sim_ratio(m1[["Mean squared error"]], "This design")
     expect_equal(as.numeric(R["Random", ]),
                  as.numeric(m1[["Mean squared error"]]["Random", ] /
                             m1[["Mean squared error"]]["This design", ]))
@@ -455,7 +455,7 @@ test_that("the app's simulation study runs per component", {
 
 test_that("the compound exact branch offers 200 runs by default", {
   skip_if_not_installed("shiny")
-  dir <- system.file("shiny", "owea-app", package = "owea")
+  dir <- system.file("shiny", "owea-app", package = "OWEAdesign")
   skip_if(!nzchar(dir) || !file.exists(file.path(dir, "app.R")),
           "the bundled app is not on disk")
   src <- paste(readLines(file.path(dir, "app.R")), collapse = "\n")
@@ -466,29 +466,29 @@ test_that("the compound exact branch offers 200 runs by default", {
 # ---- reference-value (Psi*) caching ---------------------------------------
 
 test_that(".uic_psi_key ignores what Psi* does not depend on", {
-  sp <- owea:::.uic_specs(covs2(), comps3()[1:2])
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3()[1:2])
   cm <- comps3()[1:2]
-  a1 <- owea:::.uic_solver_args(sp, cm, "design", alpha = c(0.5, 0.5))
-  a2 <- owea:::.uic_solver_args(sp, cm, "design", alpha = c(0.9, 0.1))
+  a1 <- OWEAdesign:::.uic_solver_args(sp, cm, "design", alpha = c(0.5, 0.5))
+  a2 <- OWEAdesign:::.uic_solver_args(sp, cm, "design", alpha = c(0.9, 0.1))
   # alpha does not enter a reference solve (each runs at weight 1), so the
   # stored Psi* is still valid when only the weights move
-  expect_equal(owea:::.uic_psi_key(a1), owea:::.uic_psi_key(a2))
+  expect_equal(OWEAdesign:::.uic_psi_key(a1), OWEAdesign:::.uic_psi_key(a2))
 
   # nor do n, the seed, or the efficiency switch
-  a3 <- owea:::.uic_solver_args(sp, cm, "exact", alpha = c(0.5, 0.5), n = 30)
+  a3 <- OWEAdesign:::.uic_solver_args(sp, cm, "exact", alpha = c(0.5, 0.5), n = 30)
   a3$seed <- 7
-  expect_equal(owea:::.uic_psi_key(a1), owea:::.uic_psi_key(a3))
+  expect_equal(OWEAdesign:::.uic_psi_key(a1), OWEAdesign:::.uic_psi_key(a3))
 
   # but the objectives themselves do: a different theta is a different Psi*
   cm2 <- cm; cm2[[1]]$theta <- c(0.9, 1, -1)
-  a4 <- owea:::.uic_solver_args(owea:::.uic_specs(covs2(), cm2), cm2, "design",
+  a4 <- OWEAdesign:::.uic_solver_args(OWEAdesign:::.uic_specs(covs2(), cm2), cm2, "design",
                                 alpha = c(0.5, 0.5))
-  expect_false(identical(owea:::.uic_psi_key(a1), owea:::.uic_psi_key(a4)))
+  expect_false(identical(OWEAdesign:::.uic_psi_key(a1), OWEAdesign:::.uic_psi_key(a4)))
 
   # and so does the design region / stage structure
-  a5 <- owea:::.uic_solver_args(owea:::.uic_specs(covs2("1, 0.5"), cm), cm,
+  a5 <- OWEAdesign:::.uic_solver_args(OWEAdesign:::.uic_specs(covs2("1, 0.5"), cm), cm,
                                 "design", alpha = c(0.5, 0.5))
-  expect_false(identical(owea:::.uic_psi_key(a1), owea:::.uic_psi_key(a5)))
+  expect_false(identical(OWEAdesign:::.uic_psi_key(a1), OWEAdesign:::.uic_psi_key(a5)))
 })
 
 test_that("the app reuses Psi* when only the weights change", {
@@ -555,13 +555,13 @@ as_csv <- function(d)
         collapse = "\n")
 
 test_that(".uic_solver_args disables the package cap for the app's verify", {
-  sp <- owea:::.uic_specs(covs2("0.05"), comps3())
-  v  <- owea:::.uic_solver_args(sp, comps3(), "verify", psi_star = c(1, 2, 3))
+  sp <- OWEAdesign:::.uic_specs(covs2("0.05"), comps3())
+  v  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "verify", psi_star = c(1, 2, 3))
   # the app gates the grid itself, with a modal; the package must not ALSO
   # stop (or, inside a Shiny session, open a console menu nobody can answer)
   expect_equal(v$max_points, Inf)
   # the design and exact targets never scan, so they carry no cap
-  expect_null(owea:::.uic_solver_args(sp, comps3(), "design")$max_points)
+  expect_null(OWEAdesign:::.uic_solver_args(sp, comps3(), "design")$max_points)
 })
 
 test_that("the app gates a huge verify grid instead of building it", {
@@ -570,7 +570,7 @@ test_that("the app gates a huge verify grid instead of building it", {
   shiny::testServer(e$server, {
     # a 0.002 step on [-2, 2]^2 is 2001^2 = 4,004,001 points
     set_compound(session, ccov_step_1 = "0.002", ccov_step_2 = "0.002")
-    expect_gt(owea:::.uic_verify_points(cmp_specs()), 1e6)
+    expect_gt(OWEAdesign:::.uic_verify_points(cmp_specs()), 1e6)
   })
 
   # a coarse grid is under the cap and scores straight through
@@ -578,7 +578,7 @@ test_that("the app gates a huge verify grid instead of building it", {
     set_compound(session)
     session$setInputs(cmp_compute = 1)
     expect_null(cmp_computed()$error)
-    expect_lt(owea:::.uic_verify_points(cmp_specs()), 1e6)
+    expect_lt(OWEAdesign:::.uic_verify_points(cmp_specs()), 1e6)
     session$setInputs(cmp_verify_manual = as_csv(cmp_design_df()),
                       cmp_verify_btn = 1)
     v <- rv$cmp_verify
@@ -618,19 +618,19 @@ test_that("the criterion-only route scores without the sensitivity scan", {
 # ---- reference bounds travel with cached psi_star (exact + verify paths) ---
 
 test_that("cached psi_star and reference_bound are accepted by the exact and verify paths", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
   r  <- do.call(compound_design, a)
   # the app reuses psi_star AND reference_bound from a previous run: this must
   # work for an exact design too (it failed with "unused argument" before)
-  ex <- owea:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25), n = 20)
+  ex <- OWEAdesign:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25), n = 20)
   ex$psi_star <- as.numeric(r$psi_star); ex$reference_bound <- as.numeric(r$reference_bound)
   e <- do.call(compound_exact_design, ex)
   expect_equal(sum(e$counts), 20L)
   expect_equal(unname(e$reference_bound), unname(r$reference_bound))
   expect_true(all(e$efficiency_lower_bound > 0 & e$efficiency_lower_bound <= 1 + 1e-10))
   # verify target passes the bounds through to compound_criterion()
-  v <- owea:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
+  v <- OWEAdesign:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
                                psi_star = r$psi_star, reference_bound = r$reference_bound)
   expect_equal(v$reference_bound, as.numeric(r$reference_bound))
   cc <- do.call(compound_criterion, c(list(support = r$support, weights = r$weights), v))
@@ -640,12 +640,12 @@ test_that("cached psi_star and reference_bound are accepted by the exact and ver
 # ---- the R code behind a compound result -----------------------------------
 
 test_that(".uic_r_code reproduces an approximate compound design and its scoring", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  a  <- owea:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
-  v  <- owea:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  a  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "design", alpha = c(.4, .35, .25))
+  v  <- OWEAdesign:::.uic_solver_args(sp, comps3(), "verify", alpha = c(.4, .35, .25),
                                 efficiency = TRUE)
-  code <- owea:::.uic_r_code(a, exact = FALSE, verify_args = v)
-  expect_match(code, "library\\(owea\\)")
+  code <- OWEAdesign:::.uic_r_code(a, exact = FALSE, verify_args = v)
+  expect_match(code, "library\\(OWEAdesign\\)")
   expect_match(code, "components <- list\\(")
   expect_match(code, "name\\s+= \"m1\"")
   expect_match(code, "res <- compound_design\\(")
@@ -672,12 +672,12 @@ test_that(".uic_r_code reproduces an approximate compound design and its scoring
 })
 
 test_that(".uic_r_code adds the per-objective simulation study for an exact design", {
-  sp <- owea:::.uic_specs(covs2(), comps3())
-  ea <- owea:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25),
+  sp <- OWEAdesign:::.uic_specs(covs2(), comps3())
+  ea <- OWEAdesign:::.uic_solver_args(sp, comps3(), "exact", alpha = c(.4, .35, .25),
                                 n = 24L)
   ea$seed <- 1L
   # without a simulation study: the design call only
-  code0 <- owea:::.uic_r_code(ea, exact = TRUE)
+  code0 <- OWEAdesign:::.uic_r_code(ea, exact = TRUE)
   expect_match(code0, "res <- compound_exact_design\\(")
   expect_match(code0, "n\\s+= 24")
   expect_false(grepl("compound_criterion|simulate_design", code0))
@@ -687,7 +687,7 @@ test_that(".uic_r_code adds the per-objective simulation study for an exact desi
   sim <- list(theta = list(c(0.5, 1, -1), NULL, c(0.2, 0.3, -0.3)),
               sigma = NULL, nsim = 10L, seed = 3L, existing = NULL,
               designs = list(SRS = srs))
-  code <- owea:::.uic_r_code(ea, exact = TRUE, sim = sim)
+  code <- OWEAdesign:::.uic_r_code(ea, exact = TRUE, sim = sim)
   expect_match(code, "theta_true_1 <- c\\(0.5, 1, -1\\)")
   expect_match(code, "theta_true_2 <- c\\(0.5, 1, -1, 0.5\\)")   # falls back to the assumed values
   expect_match(code, "srs_support <- rbind\\(")
@@ -704,25 +704,25 @@ test_that(".uic_r_code adds the per-objective simulation study for an exact desi
   expect_equal(rownames(env$mse_2), c("This design", "SRS"))
   expect_equal(ncol(env$mse_2), 4L)
   # ... and the study is the one the app runs: same seed, same numbers
-  app_sim <- owea:::.uic_simulate(sp, comps3(), support = env$res$support,
+  app_sim <- OWEAdesign:::.uic_simulate(sp, comps3(), support = env$res$support,
                                   counts = env$res$counts,
                                   true_theta = sim$theta, nsim = 10L, seed = 3L)
   for (j in 1:3)
     expect_equal(unname(env[[sprintf("sim_%d", j)]]$mse),
                  unname(app_sim[[j]]$mse))
-  app_srs <- owea:::.uic_simulate(sp, comps3(), support = srs$support,
+  app_srs <- OWEAdesign:::.uic_simulate(sp, comps3(), support = srs$support,
                                   counts = srs$counts,
                                   true_theta = sim$theta, nsim = 10L, seed = 3L)
   expect_equal(unname(env$sim_srs_1$mse), unname(app_srs[[1]]$mse))
 
   # an identity-link objective brings sigma, a first stage is pooled in
   ci  <- list(list(name = "lin", link = "identity", p = 0))
-  spi <- owea:::.uic_specs(covs2(), ci)
-  ei  <- owea:::.uic_solver_args(spi, ci, "exact", n = 12L); ei$seed <- 1L
+  spi <- OWEAdesign:::.uic_specs(covs2(), ci)
+  ei  <- OWEAdesign:::.uic_solver_args(spi, ci, "exact", n = 12L); ei$seed <- 1L
   simi <- list(theta = list(c(1, 2, 3)), sigma = 2, nsim = 5L, seed = 1L,
                existing = list(points = rbind(c(0, 0), c(1, 1)), counts = c(2L, 3L)),
                designs = list())
-  codei <- owea:::.uic_r_code(ei, exact = TRUE, sim = simi)
+  codei <- OWEAdesign:::.uic_r_code(ei, exact = TRUE, sim = simi)
   expect_match(codei, "sigma\\s+= 2")
   expect_match(codei, "existing\\s+= list\\(points = rbind\\(")
   envi <- new.env(parent = globalenv())
@@ -839,7 +839,7 @@ test_that("a compound computation past the time limit stops and keeps the R code
     panel <- paste(as.character(output$cmp_code_panel$html), collapse = "\n")
     expect_match(panel, "before it hit the time limit", fixed = TRUE)
     expect_null(cmp_psi_cache)                           # nothing cached from a stopped run
-    expect_false(is.finite(owea:::.timeout_state$deadline))
+    expect_false(is.finite(OWEAdesign:::.timeout_state$deadline))
     # a cheaper problem computes normally afterwards
     e$TIME_LIMIT <- 60
     set_compound(session, ccov_step_1 = "0.5", ccov_step_2 = "0.5")
@@ -872,7 +872,7 @@ test_that("a compound simulation study past the time limit is reported and kept 
     expect_match(code, "sim_1 <- simulate_design\\(")
     expect_match(code, "nsim\\s+= 20000")
     expect_silent(parse(text = code))
-    expect_false(is.finite(owea:::.timeout_state$deadline))
+    expect_false(is.finite(OWEAdesign:::.timeout_state$deadline))
   })
 })
 

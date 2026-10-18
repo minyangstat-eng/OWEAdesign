@@ -60,17 +60,17 @@ test_that("support points off the grid warn but still return a result", {
 
 test_that(".offgrid_dmax matches the full grid scan, coordinate by coordinate", {
   box <- list(A = 3, x = c(-1, 1), z = c(0, 10))
-  m   <- owea:::.parse_design_box(box)
-  by  <- owea:::.expand_stage_step(c(0.25, 2), m$is_factor,
+  m   <- OWEAdesign:::.parse_design_box(box)
+  by  <- OWEAdesign:::.expand_stage_step(c(0.25, 2), m$is_factor,
                                    sum(!m$is_factor), length(box))
   pts <- rbind(c(1, -0.25, 4),     # exactly on the grid
                c(3, 0.13, 4),      # x between grid points (nearest 0.25)
                c(2, 1.4, 11))      # outside the box in x and z
-  fast <- owea:::.offgrid_dmax(pts, m$lo, m$hi, by, m$is_factor, m$nlevels)
+  fast <- OWEAdesign:::.offgrid_dmax(pts, m$lo, m$hi, by, m$is_factor, m$nlevels)
 
   # reference: infinity-norm distance to the nearest row of the BUILT grid
   X    <- candidate_grid(box, c(0.25, 2))
-  idx  <- owea:::.nearest_idx(X, pts)
+  idx  <- OWEAdesign:::.nearest_idx(X, pts)
   slow <- vapply(seq_len(nrow(pts)),
                  function(i) max(abs(pts[i, ] - X[idx[i], ])), numeric(1))
   expect_equal(fast, slow)

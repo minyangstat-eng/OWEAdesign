@@ -11,7 +11,7 @@
 # with x in [0, 3] and assumed (theta1, theta2, theta3, theta4) = (1, 1, 1, 2).
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---- 1. User supplies the information matrix ------------------------------
 theta_ex1 <- c(1.0, 1.0, 1.0, 2.0)        # (theta1, theta2, theta3, theta4)

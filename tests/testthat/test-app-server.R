@@ -3,7 +3,7 @@
 # The pure translators behind it are tested in test-app.R.
 
 app_env <- function() {
-  dir <- system.file("shiny", "owea-app", package = "owea")
+  dir <- system.file("shiny", "owea-app", package = "OWEAdesign")
   testthat::skip_if(!nzchar(dir) || !file.exists(file.path(dir, "app.R")),
                     "the bundled app is not on disk")
   e <- new.env(parent = globalenv())
@@ -195,7 +195,7 @@ test_that("the simulation table gains a ratio column per compared design", {
     expect_false(grepl("Exact design / Exact design", tbl, fixed = TRUE))
 
     # and the printed ratio really is SRS / Exact design, per parameter
-    R <- owea:::.ui_sim_ratio(m2[["Mean squared error"]], "Exact design")
+    R <- OWEAdesign:::.ui_sim_ratio(m2[["Mean squared error"]], "Exact design")
     expect_equal(as.numeric(R["SRS", ]),
                  as.numeric(m2[["Mean squared error"]]["SRS", ] /
                             m2[["Mean squared error"]]["Exact design", ]))
@@ -329,7 +329,7 @@ test_that("verify panel checks the ORIGINAL criterion at the finest step", {
     expect_null(computed()$error)
 
     # the args verify will use: original criterion, finest step of the sequence
-    a <- owea:::.ui_solver_args(computed()$sp, "verify", computed()$theta,
+    a <- OWEAdesign:::.ui_solver_args(computed()$sp, "verify", computed()$theta,
                                 computed()$p, computed()$subset,
                                 computed()$existing)
     expect_equal(a$p, 0L)                        # the criterion chosen at compute
@@ -430,7 +430,7 @@ test_that("the continuous search flows through the app to the solver", {
     expect_identical(rv$verify$v$method, "grid")
     expect_true(rv$verify$v$is_optimal$value)
     # the verify panel uses the same continuous space
-    a <- owea:::.ui_solver_args(cc$sp, "verify", cc$theta, cc$p, cc$subset, cc$existing)
+    a <- OWEAdesign:::.ui_solver_args(cc$sp, "verify", cc$theta, cc$p, cc$subset, cc$existing)
     expect_true(a$continuous)
 
     # back to the grid: the step box is used again
@@ -524,7 +524,7 @@ test_that("a computation past the time limit stops, explains, and still shows th
     expect_match(panel, "before it hit the time limit", fixed = TRUE)
     expect_match(panel, "dl_code", fixed = TRUE)
     # the limit is disarmed, and a cheaper problem computes normally afterwards
-    expect_false(is.finite(owea:::.timeout_state$deadline))
+    expect_false(is.finite(OWEAdesign:::.timeout_state$deadline))
     e$TIME_LIMIT <- 60
     session$setInputs(cov_step_1 = "0.5", compute = 2)
     expect_null(computed()$error)
@@ -559,7 +559,7 @@ test_that("a simulation study past the time limit is reported and stays in the R
     session$setInputs(run_srs = 1)
     expect_s3_class(rv$sim$srs, "owea_timeout")
     expect_match(output$code_txt, "srs", ignore.case = TRUE)
-    expect_false(is.finite(owea:::.timeout_state$deadline))
+    expect_false(is.finite(OWEAdesign:::.timeout_state$deadline))
   })
 })
 

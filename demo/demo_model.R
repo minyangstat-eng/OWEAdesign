@@ -19,7 +19,7 @@
 # continuous range.  The default criterion is D-optimality for all parameters.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---------------------------------------------------------------------------
 # (1) Linear model, 3-level factor (zero-sum) + one continuous covariate.

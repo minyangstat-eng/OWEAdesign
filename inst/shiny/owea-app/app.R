@@ -1,5 +1,5 @@
 # ===========================================================================
-# owea web app -- point-and-click optimal designs, as a step-by-step wizard.
+# OWEAdesign web app -- point-and-click optimal designs, as a step-by-step wizard.
 #
 #   model -> start -> [existing design | existing data] -> [theta] ->
 #   criterion -> design type -> review -> results
@@ -7,10 +7,10 @@
 # Steps that do not apply are skipped: no theta step for the identity link (its
 # design is not local), and no existing-design step unless the user has one.
 #
-# Launch locally with owea::run_owea_app(), or deploy this folder to
+# Launch locally with OWEAdesign::run_owea_app(), or deploy this folder to
 # shinyapps.io / Posit Connect (see deploy/deploy.R in the source repo).
 #
-# The app depends only on the exported owea API plus the internal helpers in
+# The app depends only on the exported OWEAdesign API plus the internal helpers in
 # R/app.R (.ui_model_spec, .ui_wizard_steps, .ui_solver_args, ...), which
 # translate the friendly inputs into optimal_design()/exact_design() args and
 # are unit-tested independently of the app.  In particular EVERY solver call is
@@ -20,8 +20,8 @@
 # ===========================================================================
 
 library(shiny)
-library(owea)
-# lpSolve is an optional dependency of owea (the exact linear program behind
+library(OWEAdesign)
+# lpSolve is an optional dependency of OWEAdesign (the exact linear program behind
 # Elfving's certificate of c-optimality, used when a single parameter is of
 # interest).  Naming it here makes a deployment (shinyapps.io) install it; the
 # package falls back to a derivative-free bound without it.
@@ -46,7 +46,7 @@ N_DEFAULT_STAGE <- 20
 # run_owea_app(time_limit = ) sets it for a local run; a hosted copy reads the
 # environment variable OWEA_APP_TIME_LIMIT; otherwise 60 s.  Inf = no limit.
 # The limit protects a shared server; the package itself has none.
-TIME_LIMIT <- owea:::.ui_time_limit_default()
+TIME_LIMIT <- OWEAdesign:::.ui_time_limit_default()
 time_limit_note <- function() {
   if (!is.finite(TIME_LIMIT)) return(NULL)
   helpText(sprintf(paste(
@@ -67,7 +67,7 @@ timeout_alert <- function(msg) {
 # UI
 # ---------------------------------------------------------------------------
 ui <- fluidPage(
-  titlePanel("owea — Optimal Experimental Designs"),
+  titlePanel("OWEAdesign — Optimal Experimental Designs"),
   tags$p("Build an optimal design step by step: describe your model (or models), ",
          "set the assumed parameter values and the criterion, then compute. ",
          "No R code required."),
@@ -521,7 +521,7 @@ server <- function(input, output, session) {
         list(name = nm, type = "continuous",
              lo    = as.numeric(input[[paste0("cov_lo_", i)]] %||% -1),
              hi    = as.numeric(input[[paste0("cov_hi_", i)]] %||%  1),
-             steps = owea:::.ui_parse_steps(input[[paste0("cov_step_", i)]] %||% "0.1"))
+             steps = OWEAdesign:::.ui_parse_steps(input[[paste0("cov_step_", i)]] %||% "0.1"))
       }
     })
   })
@@ -606,7 +606,7 @@ server <- function(input, output, session) {
                     function(s) as.integer(strsplit(s, "-", fixed = TRUE)[[1]]))
     quad  <- as.integer(input$quadratics %||% character(0))
     ncat  <- if (input$link %in% MULTI_CAT) as.integer(input$ncat %||% 3) else NULL
-    owea:::.ui_model_spec(covariates(), interactions = inter, quadratics = quad,
+    OWEAdesign:::.ui_model_spec(covariates(), interactions = inter, quadratics = quad,
                           link = input$link, ncat = ncat,
                           coding = if (has_factor()) input$coding %||% "zero-sum"
                                    else "zero-sum",
@@ -616,7 +616,7 @@ server <- function(input, output, session) {
                           n_audit = 0)
   })
   spec_ok    <- reactive(tryCatch({ spec(); NULL }, error = conditionMessage))
-  coef_names <- reactive(tryCatch(owea:::.ui_coef_names(spec()),
+  coef_names <- reactive(tryCatch(OWEAdesign:::.ui_coef_names(spec()),
                                   error = function(e) NULL))
   cov_names  <- reactive(tryCatch(names(spec()$design_box),
                                   error = function(e) NULL))
@@ -631,8 +631,8 @@ server <- function(input, output, session) {
   is_compound <- reactive(identical(mode(), "compound"))
 
   steps <- reactive({
-    if (is_compound()) c("mode", owea:::.uic_wizard_steps())
-    else c("mode", owea:::.ui_wizard_steps(input$link %||% "identity",
+    if (is_compound()) c("mode", OWEAdesign:::.uic_wizard_steps())
+    else c("mode", OWEAdesign:::.ui_wizard_steps(input$link %||% "identity",
                                            input$start %||% "none"))
   })
   step_i <- reactive({ i <- match(cur(), steps()); if (is.na(i)) 1L else i })
@@ -661,10 +661,10 @@ server <- function(input, output, session) {
     if (identical(id, "mode")) return(NULL)
     # ---- compound branch ----
     if (identical(id, "cmp_cov"))
-      return(tryCatch({ owea:::.ui_design_box(cmp_covariates()); NULL },
+      return(tryCatch({ OWEAdesign:::.ui_design_box(cmp_covariates()); NULL },
                       error = conditionMessage))
     if (identical(id, "cmp_models"))
-      return(tryCatch(owea:::.uic_check(cmp_specs(), cmp_comps(), cmp_alpha()),
+      return(tryCatch(OWEAdesign:::.uic_check(cmp_specs(), cmp_comps(), cmp_alpha()),
                       error = conditionMessage))
     if (identical(id, "cmp_options")) {
       if (!identical(input$cmp_start, "design")) return(NULL)
@@ -688,7 +688,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     if (identical(id, "theta"))
-      return(tryCatch(owea:::.ui_check_theta(theta(), spec()),
+      return(tryCatch(OWEAdesign:::.ui_check_theta(theta(), spec()),
                       error = conditionMessage))
     if (identical(id, "design_type")) {
       if (need_n() && !is.finite(as.numeric(input$n_new %||% NA)))
@@ -701,7 +701,7 @@ server <- function(input, output, session) {
   # candidate-set size at each stage of the step sequence (coarsest first);
   # grid_ok remembers the counts the user already agreed to proceed with, so
   # the warning re-arms only when the grid inputs actually change
-  grid_sizes <- reactive(tryCatch(owea:::.ui_grid_sizes(covariates(), is_continuous()),
+  grid_sizes <- reactive(tryCatch(OWEAdesign:::.ui_grid_sizes(covariates(), is_continuous()),
                                   error = function(e) NULL))
   grid_ok <- reactiveVal(NULL)
 
@@ -791,7 +791,7 @@ server <- function(input, output, session) {
       d  <- exist_csv()
       if (inherits(d, "error")) stop(conditionMessage(d), call. = FALSE)
       n0 <- as.numeric(input$exist_n0 %||% NA)
-      e  <- owea:::.ui_existing_from_csv(d$support, d$val, d$valcol,
+      e  <- OWEAdesign:::.ui_existing_from_csv(d$support, d$val, d$valcol,
                                          n0 = if (is.finite(n0)) n0 else NULL)
       if (is.null(e$n0))
         stop("enter n0 — the sample size of the existing design. Weights are ",
@@ -850,7 +850,7 @@ server <- function(input, output, session) {
     resp <- input$data_response %||% NULL
 
     if (identical(input$use_cov, "yes")) {
-      ex <- tryCatch(owea:::.ui_existing_from_data(d, sp$design_box, resp),
+      ex <- tryCatch(OWEAdesign:::.ui_existing_from_data(d, sp$design_box, resp),
                      error = function(e) e)
       if (inherits(ex, "error"))
         msgs <- c(msgs, paste("Covariates as a design:", conditionMessage(ex)))
@@ -861,7 +861,7 @@ server <- function(input, output, session) {
         suppressWarnings(suppressMessages(do.call(
           fit_design,
           c(list(data = d, response = resp),
-            owea:::.ui_solver_args(sp, "fit"))))),
+            OWEAdesign:::.ui_solver_args(sp, "fit"))))),
         error = function(e) e)
       if (inherits(fit, "error"))
         msgs <- c(msgs, paste("Fitting the model:", conditionMessage(fit)))
@@ -946,13 +946,13 @@ server <- function(input, output, session) {
   })
   observeEvent(input$theta_draw, {
     sp <- tryCatch(spec(), error = function(e) NULL); req(sp)
-    th <- owea:::.ui_random_theta(sp); req(!is.null(th))
+    th <- OWEAdesign:::.ui_random_theta(sp); req(!is.null(th))
     rv$theta_prefill <- th                       # observable, and survives a re-render
     for (i in seq_along(th))
       updateNumericInput(session, paste0("theta_", i), value = round(th[i], 4))
   })
   output$theta_msg <- renderUI({
-    msg <- tryCatch(owea:::.ui_check_theta(theta(), spec()),
+    msg <- tryCatch(OWEAdesign:::.ui_check_theta(theta(), spec()),
                     error = conditionMessage)
     if (is.null(msg)) return(NULL)
     div(class = "alert alert-warning", msg)
@@ -1020,7 +1020,7 @@ server <- function(input, output, session) {
         sprintf("Candidate set: %s design points%s",
                 format(round(gs[1]), big.mark = ","),
                 if (length(gs) > 1L) " (first step of the step sequence)" else ""),
-      if (has_factor()) sprintf("Factor coding: %s", owea:::.ui_coding(sp)),
+      if (has_factor()) sprintf("Factor coding: %s", OWEAdesign:::.ui_coding(sp)),
       sprintf("Parameters (%d): %s", length(coef_names()),
               paste(coef_names(), collapse = ", ")),
       if (!identical(sp$link, "identity"))
@@ -1056,7 +1056,7 @@ server <- function(input, output, session) {
     n <- if (is_exact()) as.numeric(input$n_new %||% NA) else NULL
 
     args <- tryCatch(
-      owea:::.ui_solver_args(sp, if (is_exact()) "exact" else "optimal",
+      OWEAdesign:::.ui_solver_args(sp, if (is_exact()) "exact" else "optimal",
                              theta = theta(), p = as.integer(input$crit),
                              subset = subset_idx(), existing = ex, n = n),
       error = function(e) e)
@@ -1068,9 +1068,10 @@ server <- function(input, output, session) {
     ctx <- list(cov_names = names(sp$design_box),
                 exact = is_exact(), sp = sp, theta = theta(),
                 p = as.integer(input$crit), subset = subset_idx(),
-                existing = ex, args = args, coef_names = owea:::.ui_coef_names(sp),
+                existing = ex, args = args, coef_names = OWEAdesign:::.ui_coef_names(sp),
                 n = if (is_exact()) as.integer(n) else NA_integer_,
                 n0 = if (is.null(ex)) 0L else as.integer(ex$n0))
+    solver_fn <- if (is_exact()) exact_design else optimal_design   # read before the limit
 
     warns <- character(0)
     # wall-clock seconds for the whole solver call, as the user experienced it
@@ -1081,10 +1082,8 @@ server <- function(input, output, session) {
                      # the time limit sits right around the package call: a
                      # limit that fires inside the C++ engine arrives as an
                      # interrupt, which must not escape the reactive
-                     owea:::.ui_time_limited(
-                       do.call(if (is_exact()) exact_design else optimal_design,
-                               args),
-                       TIME_LIMIT, "design")),
+                     OWEAdesign:::.ui_time_limited(do.call(solver_fn, args),
+                                                   TIME_LIMIT, "design")),
         error = function(e) structure(list(msg = conditionMessage(e),
                                            timeout = inherits(e, "owea_timeout")),
                                       class = "owea_bad")),
@@ -1264,7 +1263,7 @@ server <- function(input, output, session) {
          seed  = as.integer(input$sim_seed %||% 1),
          existing = if (!is.null(ex))
            list(points = ex$points,
-                counts = ex$counts %||% owea:::.apportion(ex$weights, as.integer(ex$n0)))
+                counts = ex$counts %||% OWEAdesign:::.apportion(ex$weights, as.integer(ex$n0)))
            else NULL,
          obs = sim_obs(),
          designs = Filter(Negate(is.null),
@@ -1276,22 +1275,22 @@ server <- function(input, output, session) {
     c <- computed(); req(is.null(c$error) || isTRUE(c$timeout))
     # after a timeout there is no design and no verify step set up: the call only
     vargs <- if (c$exact || isTRUE(c$timeout)) NULL else {
-      has_cont <- any(!owea:::.parse_design_box(c$sp$design_box)$is_factor)
+      has_cont <- any(!OWEAdesign:::.parse_design_box(c$sp$design_box)$is_factor)
       if (has_cont && verify_audit_mode()) {
         na <- verify_audit_eff()
-        tryCatch(owea:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
+        tryCatch(OWEAdesign:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
                                         c$existing,
                                         verify_audit = if (is.na(na)) 20000L else na),
                  error = function(e) NULL)
       } else {
         se <- verify_step_eff(c)
-        tryCatch(owea:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
+        tryCatch(OWEAdesign:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
                                         c$existing,
                                         verify_step = if (se$ok) se$step else NULL),
                  error = function(e) NULL)
       }
     }
-    owea:::.ui_r_code(c$args, if (c$exact) "exact" else "optimal", verify_args = vargs,
+    OWEAdesign:::.ui_r_code(c$args, if (c$exact) "exact" else "optimal", verify_args = vargs,
                       sim = sim_code_info())
   })
   output$code_txt <- renderText(r_code())
@@ -1356,11 +1355,11 @@ server <- function(input, output, session) {
       sel <- input$eff_subset %||% character(0)
       if (length(sel)) match(sel, c$coef_names) else NULL
     } else NULL
+    p_new <- as.integer(input$eff_crit)      # read before the time-limited call
     rv$eff <- withProgress(
       message = "Optimising under the other criterion…", value = 0.5,
-      tryCatch(suppressWarnings(owea:::.ui_time_limited(
-        owea:::.ui_efficiency(c$res, c$sp, c$theta, as.integer(input$eff_crit),
-                              sub, c$existing),
+      tryCatch(suppressWarnings(OWEAdesign:::.ui_time_limited(
+        OWEAdesign:::.ui_efficiency(c$res, c$sp, c$theta, p_new, sub, c$existing),
         TIME_LIMIT, "efficiency")),
         error = function(e) e))
   })
@@ -1406,7 +1405,7 @@ server <- function(input, output, session) {
 
   output$verify_panel <- renderUI({
     c <- computed(); req(is.null(c$error)); if (isTRUE(c$exact)) return(NULL)
-    has_cont <- any(!owea:::.parse_design_box(c$sp$design_box)$is_factor)
+    has_cont <- any(!OWEAdesign:::.parse_design_box(c$sp$design_box)$is_factor)
     cont <- isTRUE(c$sp$continuous)
     tagList(
       tags$h4("Verify optimality of a design"),
@@ -1431,14 +1430,14 @@ server <- function(input, output, session) {
       if (has_cont) conditionalPanel(
         "input.verify_mode != 'audit'",
         textInput("verify_step", "grid step(s) for the check",
-                  value = isolate(input$verify_step) %||% owea:::.ui_verify_step_default(c$sp),
+                  value = isolate(input$verify_step) %||% OWEAdesign:::.ui_verify_step_default(c$sp),
                   placeholder = "one number, or one per continuous covariate"),
         if (!cont)
           div(class = "alert alert-info",
               sprintf(paste0("Optimality has already been verified on the grid of the ",
                              "computation (finest step %s). Choose a different step ",
                              "here to avoid repeating that computation."),
-                      owea:::.ui_verify_step_default(c$sp)))
+                      OWEAdesign:::.ui_verify_step_default(c$sp)))
         else
           helpText("The design was found by a continuous search, so its support ",
                    "points are off the grid: the sensitivity is evaluated at every ",
@@ -1472,11 +1471,11 @@ server <- function(input, output, session) {
   # the box is empty (NULL for an all-factor box, which is enumerated); ok is
   # FALSE only when something unusable was typed
   verify_step_eff <- function(c) {
-    if (!any(!owea:::.parse_design_box(c$sp$design_box)$is_factor))
+    if (!any(!OWEAdesign:::.parse_design_box(c$sp$design_box)$is_factor))
       return(list(step = NULL, ok = TRUE))
     raw <- trimws(as.character(input$verify_step %||% ""))
-    if (!nzchar(raw)) raw <- owea:::.ui_verify_step_default(c$sp)
-    st <- owea:::.ui_parse_steps(raw)
+    if (!nzchar(raw)) raw <- OWEAdesign:::.ui_verify_step_default(c$sp)
+    st <- OWEAdesign:::.ui_parse_steps(raw)
     list(step = st, ok = length(st) > 0 && all(st > 0))
   }
 
@@ -1499,7 +1498,7 @@ server <- function(input, output, session) {
   # .ui_solver_args' "verify" target with verify_step / verify_audit)
   run_verify <- function(criterion_only = FALSE) {
     c <- computed(); if (is.null(c) || !is.null(c$error)) return()
-    has_cont <- any(!owea:::.parse_design_box(c$sp$design_box)$is_factor)
+    has_cont <- any(!OWEAdesign:::.parse_design_box(c$sp$design_box)$is_factor)
     bad <- function(msg) {
       rv$verify <- list(v = structure(list(msg = msg), class = "owea_bad"),
                         warns = character(0), opt_crit = c$res$criterion)
@@ -1513,7 +1512,7 @@ server <- function(input, output, session) {
       if (!se$ok)
         return(bad("enter positive grid step(s) for the check: one number, or one per continuous covariate."))
       st <- se$step
-      N <- tryCatch(owea:::.ui_verify_points(c$sp, step = if (is.null(st)) 1 else st),
+      N <- tryCatch(OWEAdesign:::.ui_verify_points(c$sp, step = if (is.null(st)) 1 else st),
                     error = function(e) NA_real_)
     }
     warns <- character(0)
@@ -1529,10 +1528,10 @@ server <- function(input, output, session) {
                   call. = FALSE)
         vargs <- c(list(support = dz$support, weights = w / sw,
                         criterion_only = criterion_only),
-                   owea:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
+                   OWEAdesign:::.ui_solver_args(c$sp, "verify", c$theta, c$p, c$subset,
                                           c$existing, verify_step = st,
                                           verify_audit = if (is.na(audit)) NULL else audit))
-        owea:::.ui_time_limited(do.call(verify_optimality, vargs), TIME_LIMIT, "verify")
+        OWEAdesign:::.ui_time_limited(do.call(verify_optimality, vargs), TIME_LIMIT, "verify")
       },
       error = function(e) structure(list(msg = conditionMessage(e),
                                          timeout = inherits(e, "owea_timeout")),
@@ -1547,11 +1546,11 @@ server <- function(input, output, session) {
   # offer the same three choices as verify_optimality() itself
   observeEvent(input$verify_btn, {
     c <- computed(); if (is.null(c) || !is.null(c$error)) return()
-    has_cont <- any(!owea:::.parse_design_box(c$sp$design_box)$is_factor)
+    has_cont <- any(!OWEAdesign:::.parse_design_box(c$sp$design_box)$is_factor)
     if (has_cont && verify_audit_mode()) { run_verify(); return() }
     se <- verify_step_eff(c)
     N <- if (se$ok)
-      tryCatch(owea:::.ui_verify_points(c$sp, step = if (is.null(se$step)) 1 else se$step),
+      tryCatch(OWEAdesign:::.ui_verify_points(c$sp, step = if (is.null(se$step)) 1 else se$step),
                error = function(e) 0)
     else 0
     if (is.finite(N) && N > 1e6)
@@ -1668,15 +1667,19 @@ server <- function(input, output, session) {
       function(i) as.numeric(input[[paste0("sim_theta_", i)]] %||% 0), numeric(1))
     sigma <- if (identical(c$sp$link, "identity"))
                as.numeric(input$sim_sigma %||% 1) else 1
-    owea:::.ui_time_limited(owea:::.ui_simulate(
+    # Every reactive and input is read BEFORE the time-limited call: a limit
+    # that fires while a reactive is being evaluated for the first time leaves
+    # it half-initialised, and the next read of it fails.
+    # An OBSERVED first stage keeps its real responses; a design-only first
+    # stage has none, so they are simulated too.
+    obs  <- sim_obs()
+    ex   <- if (is.null(obs)) c$existing else NULL
+    nsim <- as.integer(input$sim_nsim %||% 1000)
+    seed <- as.integer(input$sim_seed %||% 1)
+    OWEAdesign:::.ui_time_limited(OWEAdesign:::.ui_simulate(
       c$sp, theta = theta_true, sigma = sigma,
       support = support, counts = counts,
-      # an OBSERVED first stage keeps its real responses; a design-only first
-      # stage has none, so they are simulated too
-      obs      = sim_obs(),
-      existing = if (is.null(sim_obs())) c$existing else NULL,
-      nsim = as.integer(input$sim_nsim %||% 1000),
-      seed = as.integer(input$sim_seed %||% 1)),
+      obs = obs, existing = ex, nsim = nsim, seed = seed),
       TIME_LIMIT, "simulation")
   }
 
@@ -1704,7 +1707,7 @@ server <- function(input, output, session) {
     c <- computed(); req(is.null(c$error))
     s <- rv$sim; s$pool_warn <- NULL
     r <- tryCatch({
-      d <- owea:::.ui_srs_design(c$sp, c$n)
+      d <- OWEAdesign:::.ui_srs_design(c$sp, c$n)
       s$srs_design <- list(support = d$support, counts = d$counts)
       sim_run(d$support, d$counts)
     }, error = function(e) e)
@@ -1734,7 +1737,7 @@ server <- function(input, output, session) {
   sim_mats <- reactive({
     c <- computed(); req(is.null(c$error)); s <- rv$sim
     slots <- list(`Exact design` = s$exact, SRS = s$srs, Custom = s$custom)
-    grab <- function(what) owea:::.ui_sim_matrix(
+    grab <- function(what) OWEAdesign:::.ui_sim_matrix(
       lapply(slots, function(r)
         if (is.null(r) || inherits(r, "error")) NULL else r[[what]]),
       param_names = c$coef_names)
@@ -1754,7 +1757,7 @@ server <- function(input, output, session) {
     add <- function(df, A, unit) {
       if (is.null(A)) return(df)
       for (nm in rownames(A)) df[[sprintf("%s (%s)", nm, unit)]] <- A[nm, ]
-      R <- owea:::.ui_sim_ratio(A, SIM_REF)
+      R <- OWEAdesign:::.ui_sim_ratio(A, SIM_REF)
       if (!is.null(R))
         for (nm in rownames(R))
           df[[sprintf("%s / %s (%s)", nm, SIM_REF, unit)]] <- R[nm, ]
@@ -1769,7 +1772,7 @@ server <- function(input, output, session) {
   output$sim_note <- renderUI({
     s <- rv$sim
     if (!length(s)) return(NULL)
-    ratio_ui <- if (!is.null(owea:::.ui_sim_ratio(sim_mats()[[1]], SIM_REF)))
+    ratio_ui <- if (!is.null(OWEAdesign:::.ui_sim_ratio(sim_mats()[[1]], SIM_REF)))
       helpText(tags$b(sprintf("The \"/ %s\" columns are ratios.", SIM_REF)),
                paste("Above 1 the computed design has the smaller error for",
                      "that parameter (2.0 = twice the error); below 1 the other",
@@ -1782,7 +1785,7 @@ server <- function(input, output, session) {
       r <- s[[nm]]
       if (is.null(r) || inherits(r, "error")) next
       conv <- c(conv, sprintf("%s %d/%d", lab[[nm]], r$n_converged, r$nsim))
-      d <- owea:::.ui_sim_dominance(r)
+      d <- OWEAdesign:::.ui_sim_dominance(r)
       if (is.finite(d) && d > 0.2)
         wild <- c(wild, sprintf("%s (one replicate contributes %.0f%% of an MSE)",
                                 lab[[nm]], 100 * d))
@@ -1824,7 +1827,7 @@ server <- function(input, output, session) {
   # =======================================================================
   #  COMPOUND BRANCH
   #  Everything below drives compound_design()/compound_criterion() through
-  #  owea:::.uic_solver_args(), the compound counterpart of the invariant the
+  #  OWEAdesign:::.uic_solver_args(), the compound counterpart of the invariant the
   #  classical branch keeps with .ui_solver_args(): one assembler, so the
   #  models cannot drift between the design and the verification.
   # =======================================================================
@@ -1871,7 +1874,7 @@ server <- function(input, output, session) {
         list(name = nm, type = "continuous",
              lo    = as.numeric(input[[paste0("ccov_lo_", i)]] %||% -1),
              hi    = as.numeric(input[[paste0("ccov_hi_", i)]] %||%  1),
-             steps = owea:::.ui_parse_steps(input[[paste0("ccov_step_", i)]] %||% "0.1"))
+             steps = OWEAdesign:::.ui_parse_steps(input[[paste0("ccov_step_", i)]] %||% "0.1"))
       }
     })
   })
@@ -1879,11 +1882,11 @@ server <- function(input, output, session) {
   cmp_has_factor <- reactive(
     any(vapply(cmp_covariates(), function(cv) identical(cv$type, "factor"),
                logical(1))))
-  cmp_grid_sizes <- reactive(tryCatch(owea:::.ui_grid_sizes(cmp_covariates()),
+  cmp_grid_sizes <- reactive(tryCatch(OWEAdesign:::.ui_grid_sizes(cmp_covariates()),
                                       error = function(e) NULL))
 
   output$cmp_cov_msg <- renderUI({
-    err <- tryCatch({ owea:::.ui_design_box(cmp_covariates()); NULL },
+    err <- tryCatch({ OWEAdesign:::.ui_design_box(cmp_covariates()); NULL },
                     error = conditionMessage)
     if (!is.null(err))
       return(div(class = "alert alert-danger", err))
@@ -1970,10 +1973,10 @@ server <- function(input, output, session) {
   # the specs depend on the models only, so the theta/subset widgets can safely
   # be built from them
   cmp_specs <- reactive(
-    owea:::.uic_specs(cmp_covariates(), lapply(seq_len(cmp_J()), cmp_model_comp)))
+    OWEAdesign:::.uic_specs(cmp_covariates(), lapply(seq_len(cmp_J()), cmp_model_comp)))
 
   cmp_coef_names <- function(j)
-    tryCatch(owea:::.ui_coef_names(cmp_specs()[[j]]), error = function(e) NULL)
+    tryCatch(OWEAdesign:::.ui_coef_names(cmp_specs()[[j]]), error = function(e) NULL)
 
   # the FULL component: the model plus the criterion, the parameters of
   # interest and the assumed values.  Used for validation and for solving --
@@ -2043,7 +2046,7 @@ server <- function(input, output, session) {
         observeEvent(input[[paste0("cmp_draw_", jj)]], {
           sp <- tryCatch(cmp_specs()[[jj]], error = function(e) NULL)
           if (is.null(sp)) return()
-          th <- tryCatch(owea:::.ui_random_theta(sp), error = function(e) NULL)
+          th <- tryCatch(OWEAdesign:::.ui_random_theta(sp), error = function(e) NULL)
           if (is.null(th)) return()
           for (i in seq_along(th))
             updateNumericInput(session, sprintf("cmp_theta_%d_%d", jj, i),
@@ -2054,7 +2057,7 @@ server <- function(input, output, session) {
   })
 
   output$cmp_models_msg <- renderUI({
-    msg <- tryCatch(owea:::.uic_check(cmp_specs(), cmp_comps(), cmp_alpha()),
+    msg <- tryCatch(OWEAdesign:::.uic_check(cmp_specs(), cmp_comps(), cmp_alpha()),
                     error = conditionMessage)
     if (is.null(msg)) return(NULL)
     div(class = "alert alert-warning", msg)
@@ -2063,7 +2066,7 @@ server <- function(input, output, session) {
   # ---- C3. the existing design --------------------------------------------
   cmp_exist_csv <- reactive({
     tryCatch(read_design(input$cmp_exist_file, input$cmp_exist_text,
-                         names(owea:::.ui_design_box(cmp_covariates())$design_box),
+                         names(OWEAdesign:::.ui_design_box(cmp_covariates())$design_box),
                          valcol = NULL),
              error = function(e) e)
   })
@@ -2074,7 +2077,7 @@ server <- function(input, output, session) {
     if (inherits(d, "error")) stop(conditionMessage(d), call. = FALSE)
     if (is.null(d)) stop("upload or paste your existing design.", call. = FALSE)
     n0 <- input$cmp_exist_n0
-    e  <- owea:::.ui_existing_from_csv(d$support, d$val, d$valcol,
+    e  <- OWEAdesign:::.ui_existing_from_csv(d$support, d$val, d$valcol,
                                        n0 = if (is.finite(n0 %||% NA)) n0 else NULL)
     if (is.null(e$n0))
       stop("this design has weights, not counts, so it carries no sample size: ",
@@ -2122,7 +2125,7 @@ server <- function(input, output, session) {
       if (!is.null(ex))
         sprintf("Augmenting an existing design: n0 = %d, n1 = %d.", ex$n0, ex$n1))
     comp_li <- lapply(seq_along(cm), function(j) {
-      k <- length(tryCatch(owea:::.ui_coef_names(sp[[j]]), error = function(e) ""))
+      k <- length(tryCatch(OWEAdesign:::.ui_coef_names(sp[[j]]), error = function(e) ""))
       tags$li(sprintf("%s — %s, %d parameter(s), %s-optimal%s, weight %.3f",
                       cm[[j]]$name, cm[[j]]$link, k,
                       if (cm[[j]]$p == 0) "D" else "A",
@@ -2155,7 +2158,7 @@ server <- function(input, output, session) {
     sp <- tryCatch(cmp_specs(), error = function(e) e)
     if (inherits(sp, "error")) return(bad(conditionMessage(sp)))
     cm <- cmp_comps()
-    msg <- tryCatch(owea:::.uic_check(sp, cm, cmp_alpha()),
+    msg <- tryCatch(OWEAdesign:::.uic_check(sp, cm, cmp_alpha()),
                     error = conditionMessage)
     if (!is.null(msg)) return(bad(msg))
     ex <- tryCatch(cmp_existing(), error = function(e) e)
@@ -2166,7 +2169,7 @@ server <- function(input, output, session) {
       return(bad("enter the number of runs n for an exact design."))
 
     args <- tryCatch(
-      owea:::.uic_solver_args(sp, cm, if (exact) "exact" else "design",
+      OWEAdesign:::.uic_solver_args(sp, cm, if (exact) "exact" else "design",
                               alpha = cmp_alpha(),
                               efficiency = identical(input$cmp_efficiency %||% "eff",
                                                      "eff"),
@@ -2181,7 +2184,7 @@ server <- function(input, output, session) {
     # none of that has changed since the last successful solve, hand the stored
     # psi_star back to the solver and skip the reference solves entirely.
     # Same numbers either way: this only reuses values already computed here.
-    key <- owea:::.uic_psi_key(args)
+    key <- OWEAdesign:::.uic_psi_key(args)
     reused <- FALSE
     if (isTRUE(args$efficiency) && !is.null(cmp_psi_cache) &&
         identical(cmp_psi_cache$key, key)) {
@@ -2203,7 +2206,7 @@ server <- function(input, output, session) {
     res <- withCallingHandlers(
       tryCatch(withProgress(message = "Computing the compound design…",
                             value = 0.5,
-                            owea:::.ui_time_limited(
+                            OWEAdesign:::.ui_time_limited(
                               do.call(if (exact) compound_exact_design
                                       else compound_design, args),
                               TIME_LIMIT, "design")),
@@ -2342,7 +2345,7 @@ server <- function(input, output, session) {
   })
   output$cmp_summary_tbl <- renderTable({
     c2 <- cmp_computed(); req(is.null(c2$error))
-    owea:::.uic_summary_table(c2$res)
+    OWEAdesign:::.uic_summary_table(c2$res)
   }, rownames = TRUE, digits = 6)
 
   output$cmp_cross_help <- renderUI({
@@ -2357,7 +2360,7 @@ server <- function(input, output, session) {
   })
   output$cmp_cross_tbl <- renderTable({
     c2 <- cmp_computed(); req(is.null(c2$error))
-    ct <- owea:::.uic_cross_table(c2$res)
+    ct <- OWEAdesign:::.uic_cross_table(c2$res)
     if (is.null(ct)) return(NULL)
     ct
   }, rownames = TRUE, digits = 3)
@@ -2432,14 +2435,14 @@ server <- function(input, output, session) {
       w <- as.numeric(d$val)
       if (any(w < 0)) stop("weights must be nonnegative.", call. = FALSE)
       w <- w / sum(w)
-      args <- owea:::.uic_solver_args(
+      args <- OWEAdesign:::.uic_solver_args(
         c2$specs, c2$comps, "verify", alpha = cmp_alpha(),
         efficiency = isTRUE(c2$res$efficiency_weighted),
         existing = c2$existing,
         psi_star = if (isTRUE(c2$res$efficiency_weighted)) c2$res$psi_star else NULL,
         reference_bound = if (isTRUE(c2$res$efficiency_weighted)) c2$res$reference_bound else NULL)
       withProgress(message = "Scoring the design…", value = 0.5,
-        owea:::.ui_time_limited(
+        OWEAdesign:::.ui_time_limited(
           do.call(compound_criterion,
                   c(list(support = d$support, weights = w,
                          criterion_only = isTRUE(criterion_only)), args)),
@@ -2452,7 +2455,7 @@ server <- function(input, output, session) {
   # compound_criterion() itself offers at the console
   observeEvent(input$cmp_verify_btn, {
     c2 <- cmp_computed(); req(is.null(c2$error))
-    N <- tryCatch(owea:::.uic_verify_points(c2$specs), error = function(e) 0)
+    N <- tryCatch(OWEAdesign:::.uic_verify_points(c2$specs), error = function(e) 0)
     if (is.finite(N) && N > 1e6)
       showModal(modalDialog(title = "Large design space",
         sprintf(paste0("Scoring a design evaluates the compound sensitivity at ",
@@ -2536,7 +2539,7 @@ server <- function(input, output, session) {
           "setting them apart is how you check how much the design suffers when ",
           "the guess was wrong."),
       lapply(seq_along(sp), function(j) {
-        cn <- tryCatch(owea:::.ui_coef_names(sp[[j]]), error = function(e) NULL)
+        cn <- tryCatch(OWEAdesign:::.ui_coef_names(sp[[j]]), error = function(e) NULL)
         if (is.null(cn)) return(NULL)
         th <- cm[[j]]$theta
         wellPanel(
@@ -2574,7 +2577,7 @@ server <- function(input, output, session) {
   cmp_sim_theta <- reactive({
     c2 <- cmp_computed(); req(is.null(c2$error))
     lapply(seq_along(c2$specs), function(j) {
-      cn <- tryCatch(owea:::.ui_coef_names(c2$specs[[j]]), error = function(e) NULL)
+      cn <- tryCatch(OWEAdesign:::.ui_coef_names(c2$specs[[j]]), error = function(e) NULL)
       if (is.null(cn)) return(NULL)
       vapply(seq_along(cn), function(i)
         as.numeric(input[[sprintf("cmp_sim_theta_%d_%d", j, i)]] %||% 0),
@@ -2585,14 +2588,17 @@ server <- function(input, output, session) {
   # one simulation run over all components, for a given (support, counts)
   cmp_sim_run <- function(support, counts) {
     c2 <- cmp_computed()
+    # reactives and inputs are read before the time-limited call (see sim_run)
+    theta <- cmp_sim_theta()
+    sigma <- as.numeric(input$cmp_sim_sigma %||% 1)
+    nsim  <- as.integer(input$cmp_sim_nsim %||% 500)
+    seed  <- as.integer(input$cmp_sim_seed %||% 1)
     withProgress(message = "Simulating…", value = 0.5,
-      owea:::.ui_time_limited(
-        owea:::.uic_simulate(c2$specs, c2$comps, support = support,
-                             counts = counts, true_theta = cmp_sim_theta(),
-                             sigma = as.numeric(input$cmp_sim_sigma %||% 1),
-                             existing = c2$existing,
-                             nsim = as.integer(input$cmp_sim_nsim %||% 500),
-                             seed = as.integer(input$cmp_sim_seed %||% 1)),
+      OWEAdesign:::.ui_time_limited(
+        OWEAdesign:::.uic_simulate(c2$specs, c2$comps, support = support,
+                                   counts = counts, true_theta = theta,
+                                   sigma = sigma, existing = c2$existing,
+                                   nsim = nsim, seed = seed),
         TIME_LIMIT, "simulation"))
   }
 
@@ -2609,7 +2615,7 @@ server <- function(input, output, session) {
       # a simple random sample from the finest-step grid, drawn without
       # building the grid (see .ui_srs_design())
       set.seed(as.integer(input$cmp_sim_seed %||% 1))
-      d <- owea:::.ui_srs_design(c2$specs[[1]], c2$n)
+      d <- OWEAdesign:::.ui_srs_design(c2$specs[[1]], c2$n)
       # kept apart from rv$cmp_sim, whose entries are simulation results
       # (the note and the chart walk all of them)
       rv$cmp_sim_designs$srs <- list(support = d$support, counts = d$counts)
@@ -2635,7 +2641,7 @@ server <- function(input, output, session) {
          seed  = as.integer(input$cmp_sim_seed %||% 1),
          existing = if (!is.null(ex))
            list(points = ex$points,
-                counts = ex$counts %||% owea:::.apportion(ex$weights, as.integer(ex$n0)))
+                counts = ex$counts %||% OWEAdesign:::.apportion(ex$weights, as.integer(ex$n0)))
            else NULL,
          designs = Filter(Negate(is.null),
                           list(SRS = keep(s$srs, dd$srs),
@@ -2645,11 +2651,11 @@ server <- function(input, output, session) {
     c2 <- cmp_computed(); req(is.null(c2$error) || isTRUE(c2$timeout))
     # after a timeout there is no design to score: the call only
     vargs <- if (c2$exact || isTRUE(c2$timeout)) NULL else
-      tryCatch(owea:::.uic_solver_args(
+      tryCatch(OWEAdesign:::.uic_solver_args(
         c2$specs, c2$comps, "verify", alpha = cmp_alpha(),
         efficiency = isTRUE(c2$res$efficiency_weighted), existing = c2$existing),
         error = function(e) NULL)
-    owea:::.uic_r_code(c2$args, exact = isTRUE(c2$exact), verify_args = vargs,
+    OWEAdesign:::.uic_r_code(c2$args, exact = isTRUE(c2$exact), verify_args = vargs,
                        sim = cmp_sim_code_info())
   })
   output$cmp_code_txt <- renderText(cmp_r_code())
@@ -2716,10 +2722,10 @@ server <- function(input, output, session) {
                                 `Median squared error` = NULL))
     j <- cmp_sim_which()$j
     slots <- list(`This design` = s$design, Random = s$srs, Custom = s$custom)
-    grab <- function(what) owea:::.ui_sim_matrix(
+    grab <- function(what) OWEAdesign:::.ui_sim_matrix(
       lapply(slots, function(v)
         if (!is.list(v) || inherits(v, "error")) NULL
-        else owea:::.uic_sim_mse(v[[j]], what)))
+        else OWEAdesign:::.uic_sim_mse(v[[j]], what)))
     list(`Mean squared error` = grab("mse"),
          `Median squared error` = grab("medse"))
   })
@@ -2736,7 +2742,7 @@ server <- function(input, output, session) {
     add <- function(df, A, unit) {
       if (is.null(A)) return(df)
       for (nm in rownames(A)) df[[sprintf("%s (%s)", nm, unit)]] <- A[nm, ]
-      R <- owea:::.ui_sim_ratio(A, CMP_SIM_REF)
+      R <- OWEAdesign:::.ui_sim_ratio(A, CMP_SIM_REF)
       if (!is.null(R))
         for (nm in rownames(R))
           df[[sprintf("%s / %s (%s)", nm, CMP_SIM_REF, unit)]] <- R[nm, ]
@@ -2758,7 +2764,7 @@ server <- function(input, output, session) {
     s <- rv$cmp_sim
     if (!length(s)) return(NULL)
     j <- cmp_sim_which()$j
-    ratio_ui <- if (!is.null(owea:::.ui_sim_ratio(cmp_sim_mats()[[1]],
+    ratio_ui <- if (!is.null(OWEAdesign:::.ui_sim_ratio(cmp_sim_mats()[[1]],
                                                   CMP_SIM_REF)))
       helpText(tags$b(sprintf("The \"/ %s\" columns are ratios.", CMP_SIM_REF)),
                paste("Above 1 the computed design has the smaller error for",
@@ -2774,7 +2780,7 @@ server <- function(input, output, session) {
       sj <- v[[j]]
       if (is.null(sj) || inherits(sj, "error")) next
       conv <- c(conv, sprintf("%s %d/%d", lab[[slot]], sj$n_converged, sj$nsim))
-      dom <- owea:::.ui_sim_dominance(sj)     # shared with the classical branch
+      dom <- OWEAdesign:::.ui_sim_dominance(sj)     # shared with the classical branch
       if (is.finite(dom) && dom > 0.2)
         wild <- c(wild, sprintf("%s (one replicate contributes %.0f%% of an MSE)",
                                 lab[[slot]], 100 * dom))
@@ -2890,7 +2896,7 @@ read_design <- function(file, text, cov_names, valcol = NULL) {
   list(support = sup, val = val, valcol = valcol)
 }
 
-# turn owea's technical warnings into plain language for the banner.
+# turn OWEAdesign's technical warnings into plain language for the banner.
 .friendly_warn <- function(w) {
   vapply(w, function(m) {
     if (grepl("convergence is LOCAL", m, fixed = TRUE))

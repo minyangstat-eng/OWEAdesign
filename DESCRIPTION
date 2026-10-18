@@ -1,7 +1,7 @@
-Package: owea
+Package: OWEAdesign
 Type: Package
 Title: Optimal Weights Exchange Algorithm for Approximate Optimal Designs
-Version: 0.5.1
+Version: 0.6.0
 Authors@R: person("Min", "Yang", role = c("aut", "cre"),
                   email = "minyang.stat@gmail.com")
 Description: Finds D- and A-optimal approximate designs for linear, nonlinear
@@ -22,7 +22,9 @@ Description: Finds D- and A-optimal approximate designs for linear, nonlinear
 License: GPL-3
 Encoding: UTF-8
 Imports:
-    Rcpp
+    Rcpp,
+    graphics,
+    stats
 LinkingTo:
     Rcpp,
     RcppArmadillo

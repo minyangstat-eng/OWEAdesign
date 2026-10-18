@@ -1,4 +1,14 @@
-# owea 0.5.1
+# OWEAdesign 0.6.0
+
+* The package is renamed from `owea` to `OWEAdesign`, for submission to CRAN:
+  the name `OWEA` is already taken there by the crossover-design package of
+  Hao, Yang and Zheng, and CRAN does not allow names that differ only in
+  letter case. Everything else is unchanged: load it with
+  `library(OWEAdesign)`; the function names (`optimal_design()`, `owea()`,
+  `run_owea_app()`, ...) are the same. The earlier entries below were released
+  under the old name.
+
+# OWEAdesign 0.5.1
 
 * App: the model step explains the two ways of searching continuous
   covariates before the user has to choose (on a grid: discrete candidate
@@ -24,7 +34,7 @@
   soon as it fires, so a swallowed one would have let the computation continue
   with no limit at all). Internal helper `.with_time_limit()` in `R/timeout.R`.
 
-# owea 0.5.0
+# OWEAdesign 0.5.0
 
 * c-optimality (one linear combination c'theta: a one-row `wb` or `grad_g`, or
   a one-parameter `subset`) is now certified by Elfving's bound instead of the
@@ -130,7 +140,7 @@
   [-2,2]^6, where a 0.05 grid would have 81^6 points -- 1 to 3.5 s.
 * The default `continuous = FALSE` path is unchanged.
 
-# owea 0.4.1
+# OWEAdesign 0.4.1
 
 * Efficiencies are now reported as guaranteed lower bounds relative to the TRUE
   optimum, in one field named `efficiency_lower_bound` (the former `efficiency`
@@ -141,7 +151,7 @@
   `optimal_design()` and `verify_optimality()` gain `efficiency_lower_bound`,
   computed from the design alone: `1 / (1 + max_d / v)` for D and
   `1 - max_d / criterion` for A (Theorems 4.5 and 4.6 of Becker & Yang, *Post
-  Hoc Control Group Selection via Constrained Optimal Design*; owea's `max_d` is
+  Hoc Control Group Selection via Constrained Optimal Design*; OWEAdesign's `max_d` is
   their optimality gap). `exact_design()`'s value is the ratio to the
   approximate design times that design's bound (`approx$efficiency_bound`);
   `compound_design()`'s per-component values and `cross_efficiency` are the
@@ -166,7 +176,7 @@
   The print methods of `compound_design()` and `compound_exact_design()` say the
   same.
 
-# owea 0.4.0
+# OWEAdesign 0.4.0
 
 * New `engine` argument of `optimal_design()`. `engine = "active-set"` replaces
   the weight step of the OWEA solver by an active-set Newton method: the step is
@@ -216,7 +226,7 @@
   design step now shows a note that the results page offers a simulation study
   for exact designs, so users know the design can be checked by simulating
   responses and re-estimating the parameters.
-# owea 0.3.0
+# OWEAdesign 0.3.0
 
 * Compound designs (`compound_design()`, `compound_exact_design()`), exact-design
   speedups and simulation MSE ratios.

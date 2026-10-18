@@ -321,7 +321,10 @@
 # of f at the rows of X.
 .make_model_info_vector <- function(plan) {
   if (plan$link == "identity") {
-    f   <- function(x) .model_row(x, plan)
+    # one-argument form on purpose: the package reads a one-formal information
+    # function as "needs no theta" (the linear model's design is not local)
+    f_lin <- function(x) .model_row(x, plan)
+    f   <- f_lin
     jac <- function(x, theta) .model_row_jacobian(x, plan)
     vec <- function(X, theta) t(.model_rows(X, plan))
   } else {

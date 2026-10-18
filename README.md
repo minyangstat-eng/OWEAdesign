@@ -1,6 +1,6 @@
-# owea — Optimal Weights Exchange Algorithm for approximate optimal designs
+# OWEAdesign — Optimal Weights Exchange Algorithm for approximate optimal designs
 
-`owea` finds **D- and A-optimal** experimental designs for linear, nonlinear, and
+`OWEAdesign` finds **D- and A-optimal** experimental designs for linear, nonlinear, and
 generalized linear models using the Optimal Weights Exchange Algorithm (OWEA) of
 Yang, Biedermann & Tang (2013, *JASA* 108(504), 1411–1420). An alternative
 **multiplicative-algorithm solver** (`solver = "MA"`, Yu 2010) is also available — see §9.
@@ -89,7 +89,7 @@ on it.
 
 ## 0. Web app (no coding required)
 
-For practitioners who would rather not write R, `owea` ships a point-and-click
+For practitioners who would rather not write R, `OWEAdesign` ships a point-and-click
 **web app**. You describe the model with plain inputs — a model family, named
 covariates (continuous ranges or factor levels), interactions picked by name, a
 criterion, and assumed parameter values — and get the design as a table, a plot,
@@ -150,7 +150,7 @@ Highlights of the wizard:
 
   ```r
   install.packages(c("shiny", "DT"))
-  owea::run_owea_app()
+  OWEAdesign::run_owea_app()
   ```
 
 - **Use it hosted — nothing to install:**
@@ -162,7 +162,7 @@ Highlights of the wizard:
   default, so that a shared server stays responsive. A computation that runs
   longer is stopped, the page explains how to install the package and run it
   on your own computer, and the "R code for this analysis" section still shows
-  the call. Locally, `owea::run_owea_app(time_limit = 600)` or
+  the call. Locally, `OWEAdesign::run_owea_app(time_limit = 600)` or
   `time_limit = Inf` changes or removes the limit; a hosted copy reads the
   environment variable `OWEA_APP_TIME_LIMIT`. The package functions themselves
   have no limit.
@@ -170,8 +170,8 @@ Highlights of the wizard:
 ### Hosting on shinyapps.io (free)
 
 shinyapps.io rebuilds the app's packages in the cloud. It fetches CRAN packages
-automatically, but `owea` is **not on CRAN** and has a compiled C++ core, so the
-one extra step is to serve `owea` from a **public GitHub repo** and install it
+automatically, but `OWEAdesign` is **not on CRAN** and has a compiled C++ core, so the
+one extra step is to serve `OWEAdesign` from a **public GitHub repo** and install it
 from there (that records the source the server rebuilds from). You need two free
 accounts — **GitHub** (where the package source lives) and **shinyapps.io**
 (where the app runs). The full script is [`deploy/deploy.R`](../deploy/deploy.R).
@@ -179,12 +179,12 @@ accounts — **GitHub** (where the package source lives) and **shinyapps.io**
 **One-time setup:**
 
 1. Put the package on a **public GitHub repo** — push the contents of the
-   `owea/` folder (so `DESCRIPTION` is at the repo root) to e.g.
-   `github.com/<you>/owea`.
+   package folder (so `DESCRIPTION` is at the repo root) to e.g.
+   `github.com/<you>/OWEAdesign`.
 2. Install it locally **from GitHub** so `rsconnect` records where to rebuild it:
    ```r
    install.packages(c("remotes", "rsconnect"))
-   remotes::install_github("<you>/owea")
+   remotes::install_github("<you>/OWEAdesign")
    ```
 3. Create a free account at <https://www.shinyapps.io>, then **Account → Tokens**
    and run the `rsconnect::setAccountInfo(...)` snippet it shows you.
@@ -192,17 +192,17 @@ accounts — **GitHub** (where the package source lives) and **shinyapps.io**
 **Deploy** (repeat this to publish updates):
 ```r
 rsconnect::deployApp(
-  appDir  = system.file("shiny", "owea-app", package = "owea"),
+  appDir  = system.file("shiny", "owea-app", package = "OWEAdesign"),
   appName = "owea-designs")
 ```
-The first deploy compiles `owea` on the server (a few minutes), then prints a
+The first deploy compiles `OWEAdesign` on the server (a few minutes), then prints a
 public URL like `https://<you>.shinyapps.io/owea-designs/`. Free tier: 5 apps and
 limited active hours/month. An institutional **Posit Connect** server uses the
 same `deployApp()` call.
 
 > WebAssembly/shinylive is **not** an option — RcppArmadillo does not compile to
 > WASM. If you want a single-account, self-contained alternative, a Docker image
-> (e.g. a free Hugging Face Space) can bundle `owea` directly, no GitHub needed.
+> (e.g. a free Hugging Face Space) can bundle `OWEAdesign` directly, no GitHub needed.
 
 The app is a thin wrapper over `optimal_design()` / `exact_design()`; everything
 below documents the underlying R API it drives.
@@ -212,7 +212,7 @@ below documents the underlying R API it drives.
 ## 1. Quick start
 
 ```r
-library(owea)
+library(OWEAdesign)
 
 # logistic GLM with 3 factors; information vector f(x, theta),
 # the per-point information matrix is f f'.
@@ -692,24 +692,24 @@ Check the toolchain: `pkgbuild::has_build_tools(debug = TRUE)` should be `TRUE`.
 # from GitHub:
 remotes::install_github("minyangstat-eng/owea")
 # or from a source folder / tarball:
-install.packages("/path/to/owea", repos = NULL, type = "source")
+install.packages("/path/to/OWEAdesign", repos = NULL, type = "source")
 ```
 
-Then `library(owea)`.
+Then `library(OWEAdesign)`.
 
 ---
 
 ## 14. Demos and examples
 
 ```r
-demo(package = "owea")                # list demos
+demo(package = "OWEAdesign")                # list demos
 demo("demo_unified")                  # vector vs matrix input, two-stage, optional merge
 demo("demo_general")                  # multistage A-optimal logistic GLM
 demo("demo_subset")                   # subset / grad_g
 demo("demo_exact")                    # exact (integer) designs for a given sample size
 
-source(system.file("examples", "examples.R",           package = "owea"))
-source(system.file("examples", "example_logistic3d.R", package = "owea"))
+source(system.file("examples", "examples.R",           package = "OWEAdesign"))
+source(system.file("examples", "example_logistic3d.R", package = "OWEAdesign"))
 ```
 
 ---

@@ -1,4 +1,4 @@
 library(testthat)
-library(owea)
+library(OWEAdesign)
 
-test_check("owea")
+test_check("OWEAdesign")

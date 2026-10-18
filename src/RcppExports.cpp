@@ -13,7 +13,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // compound_criterion_cpp
 double compound_criterion_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w);
-RcppExport SEXP _owea_compound_criterion_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
+RcppExport SEXP _OWEAdesign_compound_criterion_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ END_RCPP
 }
 // compound_psi_cpp
 NumericVector compound_psi_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w);
-RcppExport SEXP _owea_compound_psi_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
+RcppExport SEXP _OWEAdesign_compound_psi_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -49,7 +49,7 @@ END_RCPP
 }
 // compound_dirderiv_cpp
 NumericVector compound_dirderiv_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w);
-RcppExport SEXP _owea_compound_dirderiv_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
+RcppExport SEXP _OWEAdesign_compound_dirderiv_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,7 +67,7 @@ END_RCPP
 }
 // compound_verify_cpp
 List compound_verify_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w);
-RcppExport SEXP _owea_compound_verify_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
+RcppExport SEXP _OWEAdesign_compound_verify_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -85,7 +85,7 @@ END_RCPP
 }
 // compound_grad_hess_cpp
 List compound_grad_hess_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w);
-RcppExport SEXP _owea_compound_grad_hess_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
+RcppExport SEXP _OWEAdesign_compound_grad_hess_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -103,7 +103,7 @@ END_RCPP
 }
 // compound_weights_cpp
 List compound_weights_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector idx, NumericVector w, int min_support);
-RcppExport SEXP _owea_compound_weights_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP, SEXP min_supportSEXP) {
+RcppExport SEXP _OWEAdesign_compound_weights_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP idxSEXP, SEXP wSEXP, SEXP min_supportSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -122,7 +122,7 @@ END_RCPP
 }
 // compound_appro_opt_cpp
 List compound_appro_opt_cpp(List info_data, IntegerVector info_mode, List wb, List infor0, IntegerVector pp, NumericVector at, IntegerVector init_idx, int min_support, int max_iter, double tol, bool verbose);
-RcppExport SEXP _owea_compound_appro_opt_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP init_idxSEXP, SEXP min_supportSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _OWEAdesign_compound_appro_opt_cpp(SEXP info_dataSEXP, SEXP info_modeSEXP, SEXP wbSEXP, SEXP infor0SEXP, SEXP ppSEXP, SEXP atSEXP, SEXP init_idxSEXP, SEXP min_supportSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -143,7 +143,7 @@ END_RCPP
 }
 // criterion_cpp
 double criterion_cpp(int pp, IntegerVector idx, NumericVector w, int info_mode, const arma::mat& info_data, const arma::mat& wb, const arma::mat& infor0);
-RcppExport SEXP _owea_criterion_cpp(SEXP ppSEXP, SEXP idxSEXP, SEXP wSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP wbSEXP, SEXP infor0SEXP) {
+RcppExport SEXP _OWEAdesign_criterion_cpp(SEXP ppSEXP, SEXP idxSEXP, SEXP wSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP wbSEXP, SEXP infor0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -160,7 +160,7 @@ END_RCPP
 }
 // verify_equiv_cpp
 List verify_equiv_cpp(int pp, const arma::mat& wb, int info_mode, const arma::mat& info_data, const arma::mat& opt_infor, const arma::mat& infor0);
-RcppExport SEXP _owea_verify_equiv_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP opt_inforSEXP, SEXP infor0SEXP) {
+RcppExport SEXP _OWEAdesign_verify_equiv_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP opt_inforSEXP, SEXP infor0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -176,7 +176,7 @@ END_RCPP
 }
 // directional_deriv_cpp
 arma::vec directional_deriv_cpp(int pp, const arma::mat& wb, int info_mode, const arma::mat& info_data, const arma::mat& opt_infor, const arma::mat& infor0);
-RcppExport SEXP _owea_directional_deriv_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP opt_inforSEXP, SEXP infor0SEXP) {
+RcppExport SEXP _OWEAdesign_directional_deriv_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP opt_inforSEXP, SEXP infor0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -192,7 +192,7 @@ END_RCPP
 }
 // optimize_weights_cpp
 List optimize_weights_cpp(int pp, const arma::mat& wb, int info_mode, const arma::mat& info_data, const arma::mat& infor0, int min_support);
-RcppExport SEXP _owea_optimize_weights_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP infor0SEXP, SEXP min_supportSEXP) {
+RcppExport SEXP _OWEAdesign_optimize_weights_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP infor0SEXP, SEXP min_supportSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -208,7 +208,7 @@ END_RCPP
 }
 // appro_opt_cpp
 List appro_opt_cpp(int pp, const arma::mat& wb, int info_mode, const arma::mat& info_data, const arma::mat& infor0, IntegerVector init_idx, int min_support, int max_iter, double tol, bool verbose, int mode, int add_per_iter);
-RcppExport SEXP _owea_appro_opt_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP infor0SEXP, SEXP init_idxSEXP, SEXP min_supportSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP verboseSEXP, SEXP modeSEXP, SEXP add_per_iterSEXP) {
+RcppExport SEXP _OWEAdesign_appro_opt_cpp(SEXP ppSEXP, SEXP wbSEXP, SEXP info_modeSEXP, SEXP info_dataSEXP, SEXP infor0SEXP, SEXP init_idxSEXP, SEXP min_supportSEXP, SEXP max_iterSEXP, SEXP tolSEXP, SEXP verboseSEXP, SEXP modeSEXP, SEXP add_per_iterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -230,22 +230,22 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_owea_compound_criterion_cpp", (DL_FUNC) &_owea_compound_criterion_cpp, 8},
-    {"_owea_compound_psi_cpp", (DL_FUNC) &_owea_compound_psi_cpp, 8},
-    {"_owea_compound_dirderiv_cpp", (DL_FUNC) &_owea_compound_dirderiv_cpp, 8},
-    {"_owea_compound_verify_cpp", (DL_FUNC) &_owea_compound_verify_cpp, 8},
-    {"_owea_compound_grad_hess_cpp", (DL_FUNC) &_owea_compound_grad_hess_cpp, 8},
-    {"_owea_compound_weights_cpp", (DL_FUNC) &_owea_compound_weights_cpp, 9},
-    {"_owea_compound_appro_opt_cpp", (DL_FUNC) &_owea_compound_appro_opt_cpp, 11},
-    {"_owea_criterion_cpp", (DL_FUNC) &_owea_criterion_cpp, 7},
-    {"_owea_verify_equiv_cpp", (DL_FUNC) &_owea_verify_equiv_cpp, 6},
-    {"_owea_directional_deriv_cpp", (DL_FUNC) &_owea_directional_deriv_cpp, 6},
-    {"_owea_optimize_weights_cpp", (DL_FUNC) &_owea_optimize_weights_cpp, 6},
-    {"_owea_appro_opt_cpp", (DL_FUNC) &_owea_appro_opt_cpp, 12},
+    {"_OWEAdesign_compound_criterion_cpp", (DL_FUNC) &_OWEAdesign_compound_criterion_cpp, 8},
+    {"_OWEAdesign_compound_psi_cpp", (DL_FUNC) &_OWEAdesign_compound_psi_cpp, 8},
+    {"_OWEAdesign_compound_dirderiv_cpp", (DL_FUNC) &_OWEAdesign_compound_dirderiv_cpp, 8},
+    {"_OWEAdesign_compound_verify_cpp", (DL_FUNC) &_OWEAdesign_compound_verify_cpp, 8},
+    {"_OWEAdesign_compound_grad_hess_cpp", (DL_FUNC) &_OWEAdesign_compound_grad_hess_cpp, 8},
+    {"_OWEAdesign_compound_weights_cpp", (DL_FUNC) &_OWEAdesign_compound_weights_cpp, 9},
+    {"_OWEAdesign_compound_appro_opt_cpp", (DL_FUNC) &_OWEAdesign_compound_appro_opt_cpp, 11},
+    {"_OWEAdesign_criterion_cpp", (DL_FUNC) &_OWEAdesign_criterion_cpp, 7},
+    {"_OWEAdesign_verify_equiv_cpp", (DL_FUNC) &_OWEAdesign_verify_equiv_cpp, 6},
+    {"_OWEAdesign_directional_deriv_cpp", (DL_FUNC) &_OWEAdesign_directional_deriv_cpp, 6},
+    {"_OWEAdesign_optimize_weights_cpp", (DL_FUNC) &_OWEAdesign_optimize_weights_cpp, 6},
+    {"_OWEAdesign_appro_opt_cpp", (DL_FUNC) &_OWEAdesign_appro_opt_cpp, 12},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_owea(DllInfo *dll) {
+RcppExport void R_init_OWEAdesign(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

@@ -4,37 +4,37 @@
 #' Compound criterion value (internal).
 #' @keywords internal
 compound_criterion_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w) {
-    .Call(`_owea_compound_criterion_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
+    .Call(`_OWEAdesign_compound_criterion_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
 }
 
 #' Compound per-component criterion values (internal).
 #' @keywords internal
 compound_psi_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w) {
-    .Call(`_owea_compound_psi_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
+    .Call(`_OWEAdesign_compound_psi_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
 }
 
 #' Compound sensitivity over every candidate (internal).
 #' @keywords internal
 compound_dirderiv_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w) {
-    .Call(`_owea_compound_dirderiv_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
+    .Call(`_OWEAdesign_compound_dirderiv_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
 }
 
 #' Compound equivalence-theorem check (internal).
 #' @keywords internal
 compound_verify_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w) {
-    .Call(`_owea_compound_verify_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
+    .Call(`_OWEAdesign_compound_verify_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
 }
 
 #' Compound gradient and Hessian in the free weights (internal).
 #' @keywords internal
 compound_grad_hess_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w) {
-    .Call(`_owea_compound_grad_hess_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
+    .Call(`_OWEAdesign_compound_grad_hess_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w)
 }
 
 #' Optimal compound weights on a fixed support (internal).
 #' @keywords internal
 compound_weights_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, w, min_support) {
-    .Call(`_owea_compound_weights_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w, min_support)
+    .Call(`_OWEAdesign_compound_weights_cpp`, info_data, info_mode, wb, infor0, pp, at, idx, w, min_support)
 }
 
 #' Compound optimal design on a fixed candidate set (internal).
@@ -44,26 +44,26 @@ compound_weights_cpp <- function(info_data, info_mode, wb, infor0, pp, at, idx, 
 #' until the sensitivity falls to \code{tol}.
 #' @keywords internal
 compound_appro_opt_cpp <- function(info_data, info_mode, wb, infor0, pp, at, init_idx, min_support, max_iter, tol, verbose) {
-    .Call(`_owea_compound_appro_opt_cpp`, info_data, info_mode, wb, infor0, pp, at, init_idx, min_support, max_iter, tol, verbose)
+    .Call(`_OWEAdesign_compound_appro_opt_cpp`, info_data, info_mode, wb, infor0, pp, at, init_idx, min_support, max_iter, tol, verbose)
 }
 
 criterion_cpp <- function(pp, idx, w, info_mode, info_data, wb, infor0) {
-    .Call(`_owea_criterion_cpp`, pp, idx, w, info_mode, info_data, wb, infor0)
+    .Call(`_OWEAdesign_criterion_cpp`, pp, idx, w, info_mode, info_data, wb, infor0)
 }
 
 verify_equiv_cpp <- function(pp, wb, info_mode, info_data, opt_infor, infor0) {
-    .Call(`_owea_verify_equiv_cpp`, pp, wb, info_mode, info_data, opt_infor, infor0)
+    .Call(`_OWEAdesign_verify_equiv_cpp`, pp, wb, info_mode, info_data, opt_infor, infor0)
 }
 
 directional_deriv_cpp <- function(pp, wb, info_mode, info_data, opt_infor, infor0) {
-    .Call(`_owea_directional_deriv_cpp`, pp, wb, info_mode, info_data, opt_infor, infor0)
+    .Call(`_OWEAdesign_directional_deriv_cpp`, pp, wb, info_mode, info_data, opt_infor, infor0)
 }
 
 optimize_weights_cpp <- function(pp, wb, info_mode, info_data, infor0, min_support) {
-    .Call(`_owea_optimize_weights_cpp`, pp, wb, info_mode, info_data, infor0, min_support)
+    .Call(`_OWEAdesign_optimize_weights_cpp`, pp, wb, info_mode, info_data, infor0, min_support)
 }
 
 appro_opt_cpp <- function(pp, wb, info_mode, info_data, infor0, init_idx, min_support, max_iter, tol, verbose, mode = 0L, add_per_iter = 1L) {
-    .Call(`_owea_appro_opt_cpp`, pp, wb, info_mode, info_data, infor0, init_idx, min_support, max_iter, tol, verbose, mode, add_per_iter)
+    .Call(`_OWEAdesign_appro_opt_cpp`, pp, wb, info_mode, info_data, infor0, init_idx, min_support, max_iter, tol, verbose, mode, add_per_iter)
 }
 

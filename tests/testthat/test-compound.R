@@ -116,11 +116,11 @@ test_that("the gradient and Hessian match finite differences", {
   pp  <- c(0L, 0L, 1L); at <- c(1.4, 1.2, 0.05)
 
   crit <- function(ww)
-    owea:::compound_criterion_cpp(dat, rep(0L, 3), G, I0, pp, at, idx, ww)
+    OWEAdesign:::compound_criterion_cpp(dat, rep(0L, 3), G, I0, pp, at, idx, ww)
   Pw <- function(u) crit(c(u, 1 - sum(u)))
   u0 <- w[1:4]
 
-  gh <- owea:::compound_grad_hess_cpp(dat, rep(0L, 3), G, I0, pp, at, idx, w)
+  gh <- OWEAdesign:::compound_grad_hess_cpp(dat, rep(0L, 3), G, I0, pp, at, idx, w)
   ng <- vapply(1:4, function(i) { e <- rep(0, 4); e[i] <- 1e-6
                                   (Pw(u0 + e) - Pw(u0 - e)) / 2e-6 }, numeric(1))
   expect_equal(as.numeric(gh$gradient), ng, tolerance = 1e-6)

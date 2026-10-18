@@ -8,7 +8,7 @@
 #   (3) OPTIONAL neighbourhood merging (default off).
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # Bi-exponential nonlinear model, theta = (1, 1, 1, 2).
 theta <- c(1, 1, 1, 2)

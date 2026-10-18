@@ -10,7 +10,7 @@
 # Supply AT MOST ONE; omitting both targets ALL parameters.
 ###############################################################################
 
-library(owea)
+library(OWEAdesign)
 
 # ---- Model: bi-exponential nonlinear regression (4 parameters) ------------
 theta0 <- c(1.0, 1.0, 1.0, 2.0)

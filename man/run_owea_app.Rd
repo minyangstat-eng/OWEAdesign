@@ -2,7 +2,7 @@
 % Please edit documentation in R/app.R
 \name{run_owea_app}
 \alias{run_owea_app}
-\title{Launch the owea point-and-click web app.}
+\title{Launch the OWEAdesign point-and-click web app.}
 \usage{
 run_owea_app(launch.browser = TRUE, time_limit = 60, ...)
 }

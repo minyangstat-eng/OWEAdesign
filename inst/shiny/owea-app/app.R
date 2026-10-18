@@ -80,6 +80,33 @@ ui <- fluidPage(
     # ---- 0. mode ----------------------------------------------------------
     tabPanelBody(
       "mode",
+      # a first-time visitor's starting point: what an optimal design is, in
+      # three sentences, and where to read more (links open in a new tab so a
+      # half-finished design is not lost)
+      div(class = "alert alert-info",
+          tags$b("New to optimal design? "),
+          "An experiment's design is where you take your observations (which ",
+          "doses, settings or covariate values) and how many runs you put at ",
+          "each. For a given model, the design decides how precisely its ",
+          "parameters can be estimated, and an optimal design makes that ",
+          "precision as high as the number of runs allows. This app finds that ",
+          "design for your model.",
+          tags$ul(style = "margin-top:6px; margin-bottom:0;",
+            tags$li(tags$a(href = "https://github.com/minyangstat-eng/OWEAdesign/blob/main/slides/owea_slides.pdf",
+                           target = "_blank", rel = "noopener",
+                           "Introduction slides (PDF)"),
+                    ": a short course on optimal design, the OWEA algorithm, ",
+                    "the package and this app (about 20 minutes)."),
+            tags$li(tags$a(href = "https://github.com/minyangstat-eng/OWEAdesign",
+                           target = "_blank", rel = "noopener",
+                           "The OWEAdesign package on GitHub"),
+                    ": the full documentation, and the R package behind this app."),
+            tags$li(tags$a(href = "https://doi.org/10.1080/01621459.2013.806268",
+                           target = "_blank", rel = "noopener",
+                           "The paper"),
+                    ": Yang, Biedermann and Tang (2013), ",
+                    tags$i("Journal of the American Statistical Association"),
+                    ", for the theory."))),
       h4("Step: what kind of design problem is this?"),
       radioButtons(
         "mode_choice", NULL, selected = "classical",

@@ -588,3 +588,18 @@ test_that("the model step explains the two search methods before the choice", {
     expect_null(output$search_ui)
   })
 })
+
+test_that("the first page points a newcomer to the slides, GitHub and the paper", {
+  skip_if_not_installed("shiny"); skip_if_not_installed("DT")
+  e <- app_env()
+  ui <- gsub("\\s+", " ", paste(as.character(e$ui), collapse = " "))
+  expect_match(ui, "New to optimal design?", fixed = TRUE)
+  expect_match(ui, "slides/owea_slides.pdf", fixed = TRUE)
+  expect_match(ui, "github.com/minyangstat-eng/OWEAdesign\"", fixed = TRUE)
+  expect_match(ui, "doi.org/10.1080/01621459.2013.806268", fixed = TRUE)
+  # each of the three links opens in a new tab, so a half-finished design is
+  # not lost (other pages have new-tab links of their own, so match each one)
+  expect_match(ui, 'slides/owea_slides.pdf" target="_blank"', fixed = TRUE)
+  expect_match(ui, 'minyangstat-eng/OWEAdesign" target="_blank"', fixed = TRUE)
+  expect_match(ui, '2013.806268" target="_blank"', fixed = TRUE)
+})

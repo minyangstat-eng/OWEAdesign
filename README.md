@@ -22,6 +22,28 @@ on it.
 
 ---
 
+## What's new in 0.6.0
+
+- **The package is now called `OWEAdesign`** (it was `owea`), for submission to
+  CRAN: the name `OWEA` is already taken there by the crossover-design package
+  of Hao, Yang and Zheng, and CRAN does not allow names that differ only in
+  letter case. Load it with `library(OWEAdesign)`; every function keeps its
+  name (`optimal_design()`, `owea()`, `run_owea_app()`, ...). The repository
+  moved to `github.com/minyangstat-eng/OWEAdesign` (old links redirect).
+- **c-optimality: a robust value for singular designs.** The value `c'M^-c`
+  of a design is now computed from the eigen-decomposition of its information
+  matrix rather than through the engine's ridge / pseudo-inverse, which gave
+  platform-dependent nonsense for a singular c-optimal design (a value of 0,
+  and a value below Elfving's lower bound, were seen on other platforms); a
+  design that does not estimate `c'theta` reports `Inf`. Elfving's certificate
+  refuses a value more than 0.1% below the bound. `solver = "MA"` falls back
+  to the OWEA engine when its design has no finite value.
+- **Checked on Linux, macOS and Windows** (R-release and R-devel) by GitHub
+  Actions on every push; the slow tests are skipped on CRAN.
+- **Introduction slides** in [`slides/`](slides/) (LaTeX source, figures and
+  PDF, CC BY 4.0), and a "New to optimal design?" box on the app's first page
+  that links to them, to the repository and to the paper.
+
 ## What's new in 0.5.1
 
 - **App: a time limit per computation** (default 60 s). A design search,

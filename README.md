@@ -13,7 +13,7 @@ Yang, Biedermann & Tang (2013, *JASA* 108(504), 1411–1420). An alternative
 **multiplicative-algorithm solver** (`solver = "MA"`, Yu 2010) is also available — see §9.
 
 > ### ▶ Try the web app — no installation
-> **<https://owea.shinyapps.io/owea-designs/>**
+> **<https://statlab.math.uic.edu/OWEAdesign/>**
 > Open it in any browser (works on phones and tablets too): describe your model
 > with menus, click *Compute*, and get the design. No R, no setup.
 
@@ -183,9 +183,11 @@ Highlights of the wizard:
   ```
 
 - **Use it hosted — nothing to install:**
-  **<https://owea.shinyapps.io/owea-designs/>**
+  **<https://statlab.math.uic.edu/OWEAdesign/>**
   Open it in any browser (phones and tablets included) — no R, no Rtools, no
   setup. This is the easiest way to try the tool or share it with collaborators.
+  The app is hosted by the Department of Mathematics, Statistics and Computer
+  Science at the University of Illinois Chicago.
 
 - **Time limit.** Each computation in the app is limited to 60 seconds by
   default, so that a shared server stays responsive. A computation that runs
@@ -196,9 +198,10 @@ Highlights of the wizard:
   environment variable `OWEA_APP_TIME_LIMIT`. The package functions themselves
   have no limit.
 
-### Hosting on shinyapps.io (free)
+### Hosting your own copy on shinyapps.io (free)
 
-shinyapps.io rebuilds the app's packages in the cloud. It fetches CRAN packages
+If you would rather run your own copy of the app than use the hosted one above,
+shinyapps.io is a free option. It rebuilds the app's packages in the cloud. It fetches CRAN packages
 automatically, but `OWEAdesign` is **not on CRAN** and has a compiled C++ core, so the
 one extra step is to serve `OWEAdesign` from a **public GitHub repo** and install it
 from there (that records the source the server rebuilds from). You need two free

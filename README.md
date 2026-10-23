@@ -880,3 +880,11 @@ component's `theta`.
 The theory — the compound equivalence theorem, the weight gradient and
 Hessian, and the derivation of both — is in `theory/compound-criterion.tex`
 and `theory/second-derivative-derivation.tex`.
+
+---
+
+## 17. Acknowledgements
+
+The code, tests and documentation of this package were developed with the
+assistance of Claude (Anthropic), an AI assistant, under the direction of the
+author, who is responsible for their content.

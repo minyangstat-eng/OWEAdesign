@@ -27,6 +27,11 @@
 #'     information-vector API (fast path) kept for compatibility.}
 #' }
 #'
+#' @section Acknowledgements:
+#' The code, tests and documentation of this package were developed with the
+#' assistance of Claude (Anthropic), an AI assistant, under the direction of
+#' the author, who is responsible for their content.
+#'
 #' @references Yang, M., Biedermann, S. & Tang, E. (2013). On Optimal Designs
 #'   for Nonlinear Models: A General and Efficient Algorithm. \emph{JASA}
 #'   108(504), 1411-1420.

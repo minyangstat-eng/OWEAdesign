@@ -10,15 +10,15 @@ Description: Finds D- and A-optimal approximate designs for linear, nonlinear
     <doi:10.1080/01621459.2013.806268>. The model enters the algorithm through
     a single per-point function returning EITHER the information vector
     f(x, theta) (per-point information matrix = f f', the fast path) OR the full
-    k-by-k information matrix at x (the general path). A single C++ core
-    (RcppArmadillo) handles both representations. Supports D- and A-optimality,
+    k-by-k information matrix at x (the general path). A single 'C++' core
+    ('RcppArmadillo') handles both representations. Supports D- and A-optimality,
     general differentiable functions g(theta) of the parameters, multistage
     designs that augment an existing design, sequential (coarse-to-fine) grid
     search or a grid-free search over continuous covariates, and optional
     merging of neighbouring support points. Also provides
     exact (integer-run) designs, maximum-likelihood estimation of the model
     parameters from an observed data set, simulation studies, and a
-    point-and-click Shiny app.
+    point-and-click 'Shiny' app.
 License: GPL-3
 Encoding: UTF-8
 Imports:

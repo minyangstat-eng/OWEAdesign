@@ -3,9 +3,9 @@
 [![R-CMD-check](https://github.com/minyangstat-eng/OWEAdesign/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/minyangstat-eng/OWEAdesign/actions/workflows/R-CMD-check.yaml)
 
 > **Introduction slides.** A talk introducing optimal design, the OWEA
-> algorithm, the package and the web app lives in [`slides/`](slides/): the
+> algorithm, the package and the web app lives in [`slides/`](https://github.com/minyangstat-eng/OWEAdesign/tree/main/slides): the
 > PDF, the LaTeX (beamer) source and every figure, so you can present it as
-> is or adapt it. Licensed CC BY 4.0; see [`slides/README.md`](slides/README.md).
+> is or adapt it. Licensed CC BY 4.0; see [`slides/README.md`](https://github.com/minyangstat-eng/OWEAdesign/blob/main/slides/README.md).
 
 `OWEAdesign` finds **D- and A-optimal** experimental designs for linear, nonlinear, and
 generalized linear models using the Optimal Weights Exchange Algorithm (OWEA) of
@@ -40,7 +40,7 @@ on it.
   to the OWEA engine when its design has no finite value.
 - **Checked on Linux, macOS and Windows** (R-release and R-devel) by GitHub
   Actions on every push; the slow tests are skipped on CRAN.
-- **Introduction slides** in [`slides/`](slides/) (LaTeX source, figures and
+- **Introduction slides** in [`slides/`](https://github.com/minyangstat-eng/OWEAdesign/tree/main/slides) (LaTeX source, figures and
   PDF, CC BY 4.0), and a "New to optimal design?" box on the app's first page
   that links to them, to the repository and to the paper.
 
@@ -206,7 +206,7 @@ automatically, but `OWEAdesign` is **not on CRAN** and has a compiled C++ core, 
 one extra step is to serve `OWEAdesign` from a **public GitHub repo** and install it
 from there (that records the source the server rebuilds from). You need two free
 accounts — **GitHub** (where the package source lives) and **shinyapps.io**
-(where the app runs). The full script is [`deploy/deploy.R`](../deploy/deploy.R).
+(where the app runs).
 
 **One-time setup:**
 
